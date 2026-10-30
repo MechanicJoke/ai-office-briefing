@@ -1,0 +1,1864 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 오피스 상황판</title>
+<style>
+:root{
+  --bg:#f5f2ec; --panel:#fffdf9; --ink:#2d2b27; --muted:#7a756b; --line:#e5dfd3;
+  --ok:#2f8f5b; --ok-bg:#e3f3ea; --warn:#b7791f; --warn-bg:#fbf0dc; --bad:#c0392b; --bad-bg:#f9e2df;
+  --idle:#8a877f; --idle-bg:#eceae4; --accent:#3f6b55; --accent-bg:#e2efe6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#191a17; --panel:#22231f; --ink:#ece8de; --muted:#a39e92; --line:#373731;
+    --ok:#5cc28a; --ok-bg:#1f3529; --warn:#e0a84a; --warn-bg:#3a2f1c; --bad:#ef7a6c; --bad-bg:#3d2320;
+    --idle:#a39e92; --idle-bg:#302e29; --accent:#8fcfa8; --accent-bg:#233429;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#191a17; --panel:#22231f; --ink:#ece8de; --muted:#a39e92; --line:#373731;
+  --ok:#5cc28a; --ok-bg:#1f3529; --warn:#e0a84a; --warn-bg:#3a2f1c; --bad:#ef7a6c; --bad-bg:#3d2320;
+  --idle:#a39e92; --idle-bg:#302e29; --accent:#8fcfa8; --accent-bg:#233429;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+.wrap{max-width:1160px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:14px}
+h1{font-size:22px;margin:0;font-weight:700;letter-spacing:-.01em}
+h2{font-size:16px;margin:0 0 10px;font-weight:700}
+.sub{color:var(--muted);font-size:13px}
+.pill{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:600}
+.ok{color:var(--ok);background:var(--ok-bg)} .warn{color:var(--warn);background:var(--warn-bg)}
+.bad{color:var(--bad);background:var(--bad-bg)} .idle{color:var(--idle);background:var(--idle-bg)}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.summary{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+.office{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:18px}
+.office-head{display:flex;flex-wrap:wrap;gap:8px 12px;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.ctrls{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{border:0;background:var(--panel);color:var(--muted);padding:4px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent-bg);color:var(--accent);font-weight:700}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:4px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.scene{position:relative;background:linear-gradient(180deg,#eef3ee 0%,#f6f1e8 100%);transition:background .8s}
+.scene[data-phase="dusk"]{background:linear-gradient(180deg,#f3dcc8 0%,#efe2d2 100%)}
+.scene[data-phase="night"]{background:linear-gradient(180deg,#1e2438 0%,#2a2f42 100%)}
+.clock{position:absolute;left:14px;top:10px;font-size:12px;font-weight:700;color:#5d6b60;background:rgba(255,255,255,.7);border-radius:999px;padding:2px 10px}
+.scene[data-phase="night"] .clock{color:#d9def0;background:rgba(30,36,56,.7)}
+svg.iso{width:100%;height:auto;display:block}
+.iso text{font-family:inherit}
+.iso .hit{cursor:pointer}
+.iso .floorlabel{font-size:15px;font-weight:800;fill:#8c775a;opacity:.75;letter-spacing:.03em}
+.iso .bub rect{filter:drop-shadow(0 2px 3px rgba(60,45,30,.18))}
+.iso .bub text{font-size:11px;font-weight:700}
+
+/* ----- characters ----- */
+.chibi .torso,.chibi .head,.chibi .hand,.chibi .armL,.chibi .armR,.chibi .eyes,.chibi .mark,.chibi .steam path,.chibi .spark{transform-box:fill-box}
+.chibi .torso{transform-origin:50% 100%;transition:transform .5s}
+.chibi .head{transform-origin:50% 85%;transition:transform .5s}
+.chibi .eyes{transition:transform .5s}
+.chibi .closed{display:none}
+.st-ok .torso{transform:rotate(-5deg)}
+.st-bad .torso{transform:translateY(5px) rotate(7deg)}
+.st-bad .eyes .open{display:none} .st-bad .closed{display:inline}
+.look .chibi .head{transform:rotate(var(--look,0deg))}
+.look .chibi .eyes{transform:translateX(var(--eye,0px))}
+.look .st-bad .torso{transform:none}
+@media (prefers-reduced-motion: no-preference){
+  .st-work .armL{animation:type .32s ease-in-out infinite alternate;transform-origin:50% 0}
+  .st-work .armR{animation:type .32s ease-in-out .16s infinite alternate;transform-origin:50% 0}
+  @keyframes type{to{transform:translateY(2.5px)}}
+  .st-ok .steam path{animation:steam 2.4s ease-in infinite;transform-origin:50% 100%}
+  .st-ok .steam path:nth-child(2){animation-delay:1.2s}
+  @keyframes steam{0%{opacity:0;transform:translateY(3px)}30%{opacity:.8}100%{opacity:0;transform:translateY(-9px)}}
+  .st-warn .head{animation:tilt 2.8s ease-in-out infinite}
+  @keyframes tilt{0%,100%{transform:rotate(0)}40%,60%{transform:rotate(10deg)}}
+  .st-warn .mark{animation:bob 1.4s ease-in-out infinite alternate}
+  @keyframes bob{to{transform:translateY(-3px)}}
+  .st-bad .mark{animation:bob 2s ease-in-out infinite alternate}
+  .st-new .armR{animation:wave .6s ease-in-out infinite alternate;transform-origin:50% 100%}
+  @keyframes wave{from{transform:rotate(-150deg)}to{transform:rotate(-115deg)}}
+  .st-new .spark,.st-plan .spark{animation:twinkle 1.6s ease-in-out infinite alternate}
+  .die{animation:roll 3s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 50%}
+  @keyframes roll{0%,70%{transform:rotate(0)}80%{transform:rotate(200deg) translateY(-4px)}90%,100%{transform:rotate(360deg)}}
+  .cheer .armL,.cheer .armR{animation:cheer .7s ease-in-out infinite alternate}
+  @keyframes cheer{to{translate:0 -2px}}
+  @keyframes twinkle{from{opacity:.25;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+  .chibi .blink{animation:blink 4.5s infinite}
+  @keyframes blink{0%,95%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+  .leaf-sway{animation:sway 5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 0}
+  @keyframes sway{to{transform:rotate(3deg)}}
+}
+.chibi .blink{transform-box:fill-box;transform-origin:50% 50%}
+.st-new .armR{transform:rotate(-130deg);transform-origin:50% 100%}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;padding:9px 14px 11px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-1px;margin-right:5px}
+.add{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:12px 14px;border-top:1px solid var(--line);font-size:13px}
+.add label{display:flex;flex-direction:column;gap:3px;color:var(--muted);font-size:12px}
+.add input,.add select{font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);min-width:120px}
+.add .err{color:var(--bad);font-size:12.5px;width:100%;min-height:1em}
+.add .hint{color:var(--muted);font-size:12px;width:100%}
+
+.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.detail-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+.detail-top h2{margin:0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13.5px;margin:10px 0}
+.kv dt{color:var(--muted)} .kv dd{margin:0}
+.file{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;background:var(--idle-bg);padding:1px 6px;border-radius:5px;word-break:break-all}
+ul.items{margin:8px 0 0;padding-left:18px} ul.items li{margin:3px 0}
+.brief{white-space:pre-wrap;font-family:inherit;font-size:14px;line-height:1.7;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;margin:0}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:4px 12px;font:inherit;font-size:13px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--accent-bg);color:var(--accent);border-color:transparent;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.kpi .l{font-size:12.5px;color:var(--muted)} .kpi .v{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .d{font-size:12px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12.5px}
+td.num{font-variant-numeric:tabular-nums}
+td .pill{padding:2px 7px}
+.stack{display:flex;flex-direction:column;gap:18px}
+.todo{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.todo:last-child{border-bottom:0}
+/* ----- 업무 흐름 보기 ----- */
+.office.wide{width:min(1880px,calc(100vw - 32px));margin-left:50%;transform:translateX(-50%)}
+.flowwrap[hidden],.scene[hidden],.legend[hidden],.add[hidden]{display:none}
+.flowbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.flowkeys{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.flowkeys i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.flowscroll{overflow:auto;max-height:80vh;background:var(--bg);cursor:grab;touch-action:pan-x pan-y}
+.flowscroll.drag{cursor:grabbing;user-select:none}
+svg.flow{display:block}
+.flow text{font-family:inherit}
+.flow .fnode{cursor:pointer}
+.flow .fnode .box{fill:var(--panel);stroke:var(--line);stroke-width:1.2}
+.flow .fnode:hover .box{stroke:var(--muted)}
+.flow .fnode.sel .box{stroke:var(--accent);stroke-width:2.4}
+.flow .fnode.planned{opacity:.62}
+.flow .fnode.planned .box{stroke-dasharray:6 4}
+.flow .t1{font-size:13.5px;font-weight:700;fill:var(--ink)}
+.flow .t2{font-size:11.5px;fill:var(--muted)}
+.flow .tm{font-size:11.5px;font-weight:600}
+.flow .colh{font-size:12px;font-weight:700;fill:var(--muted);letter-spacing:.04em}
+.flow .lane{fill:var(--panel);opacity:.55}
+.flow .lanet{font-size:12.5px;font-weight:800;fill:var(--muted)}
+.flow .edge path.w{fill:none;stroke:#a9a294;stroke-width:1.8}
+.flow .edge.dash path.w{stroke-dasharray:5 5}
+.flow .edge .lb rect{fill:var(--panel);stroke:var(--line)}
+.flow .edge .lb text{font-size:10.5px;fill:var(--muted)}
+.flow .edge.hot path.w{stroke:var(--accent);stroke-width:2.6}
+.flow .edge.hot .lb text{fill:var(--accent);font-weight:700}
+.flow .dim,.flow .fnode.planned.dim{opacity:.13}
+.flow .tray rect.chip{fill:var(--panel);stroke:var(--line);stroke-dasharray:4 3}
+@media (prefers-reduced-motion: no-preference){
+  .flow .edge.hot path.w{stroke-dasharray:7 5;animation:flowmove .9s linear infinite}
+  @keyframes flowmove{to{stroke-dashoffset:-12}}
+}
+/* ----- 대표 결재함 (관제실) ----- */
+.ctrl{margin-bottom:18px}
+.ctrl-head{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.ctrl-head h2{margin:0}
+.ctrl-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.ctrl-cols > div{min-width:0}
+.ctrl h3{font-size:14px;margin:0 0 8px}
+.grp{border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:8px}
+.grp-t{font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:2px}
+.pick{display:flex;gap:9px;align-items:flex-start;padding:5px 0;font-size:14px;cursor:pointer}
+.pick input{margin-top:4px;accent-color:var(--accent)}
+.pick small{display:block;color:var(--muted);font-size:12px}
+.pick.off{opacity:.45;cursor:default}
+.ctrl-act{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.btn.main{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:700}
+.btn:disabled{opacity:.45;cursor:default}
+.btn:focus-visible,.pick input:focus-visible,.fin input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cmsg{font-size:13px;color:var(--accent)} .cmsg.err{color:var(--bad)}
+.fin{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;flex-direction:column;gap:7px}
+.fin-top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:14px}
+.fin-top b{word-break:break-all}
+.fin-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fin input{flex:1 1 160px;min-width:0;font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+.ctrl-off{font-size:13.5px;color:var(--muted)}
+@media (max-width:820px){ .ctrl-cols{grid-template-columns:1fr} }
+footer{margin-top:22px;font-size:12px;color:var(--muted);text-align:center}
+@media (max-width:820px){ .grid{grid-template-columns:1fr} .kpis{grid-template-columns:repeat(2,1fr)} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>AI 오피스 상황판</h1>
+      <div class="sub" id="runline"></div>
+    </div>
+    <div class="summary" id="summary"></div>
+  </header>
+
+  <section class="office" aria-label="사무실 배치도">
+    <div class="office-head">
+      <span id="viewHint">사람·책상·라운지를 누르면 설명이 보여요 · 대표님을 누르면 직원들이 돌아봐요</span>
+      <div class="ctrls">
+        <div class="seg" role="group" aria-label="보기" id="viewSeg">
+          <button type="button" data-v="office">사무실</button><button type="button" data-v="flow">업무 흐름</button>
+        </div>
+        <div class="seg" role="group" aria-label="조명" id="phaseSeg" data-office>
+          <button type="button" data-p="auto">자동</button><button type="button" data-p="day">낮</button><button type="button" data-p="dusk">저녁</button><button type="button" data-p="night">밤</button>
+        </div>
+        <button class="btn" id="themeBtn" type="button">화면 밝기 전환</button>
+      </div>
+    </div>
+    <div class="scene" id="scene"><span class="clock" id="clock"></span><svg class="iso" id="iso" role="img" aria-label="북유럽 온실 사무실 배치도"></svg></div>
+    <div class="flowwrap" id="flowWrap" hidden>
+      <div class="flowbar">
+        <div class="flowkeys" id="flowKeys"></div>
+        <div class="ctrls"><button class="btn" type="button" id="fzOut" aria-label="작게">−</button><button class="btn" type="button" id="fzIn" aria-label="크게">+</button><button class="btn" type="button" id="fzFit">전체 보기</button><button class="btn" type="button" id="fzClear">강조 지우기</button></div>
+      </div>
+      <div class="flowscroll" id="flowScroll"><svg class="flow" id="flow" role="img" aria-label="직원과 업무의 연결 흐름도"></svg></div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <form class="add" id="addForm" novalidate>
+      <label>부서<select id="addDept"></select></label>
+      <label>이름<input id="addName" maxlength="8" placeholder="예: 검색윤"></label>
+      <label>직함<input id="addRole" maxlength="16" placeholder="예: 보드게임 검색"></label>
+      <button class="btn" type="submit">책상 추가 (미리보기)</button>
+      <button class="btn" type="button" id="resetBtn">미리보기 지우기</button>
+      <div class="err" id="addErr" role="alert"></div>
+      <div class="hint">미리보기는 저장되지 않아요. 실제 직원은 업무 분장표를 만들면 매일 아침 게시물에 자동으로 들어와 책상이 생겨요.</div>
+    </form>
+  </section>
+
+  <section class="card ctrl" id="ctrlRoom" aria-label="대표 결재함"></section>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="stack">
+      <section class="card" id="detail" aria-live="polite"></section>
+      <section class="card">
+        <h2>오늘 브리핑</h2>
+        <div class="tabs" role="tablist" id="briefTabs"></div>
+        <pre class="brief" id="briefBody"></pre>
+      </section>
+    </div>
+    <div class="stack">
+      <section class="card">
+        <h2>최근 실행 기록</h2>
+        <table><thead><tr><th>시각</th><th>방식</th><th>결과</th><th>걸린 시간</th></tr></thead><tbody id="runs"></tbody></table>
+      </section>
+      <section class="card">
+        <h2>사무실 점검</h2>
+        <div id="checks"></div>
+      </section>
+    </div>
+  </div>
+
+  <footer><span id="dataNote"></span> · 보기 전용 화면이라 사무실 업무에 영향을 주지 않습니다</footer>
+</div>
+
+<script>
+/* 직원 명부: 부서, 이름, 직함, 모습. 직원이 늘거나 바뀔 때만 고친다. */
+window.OFFICE_STAFF = {
+  "ceo": {
+    "name": "대표",
+    "look": {
+      "skin": 2,
+      "hair": "short",
+      "hairColor": "#2a2522",
+      "top": "cardigan",
+      "topColor": "#55697a",
+      "inner": "#f2efe8",
+      "acc": []
+    }
+  },
+  "departments": [
+    {
+      "id": "macro",
+      "name": "거시경제 팀",
+      "division": "재테크 본부"
+    },
+    {
+      "id": "pf",
+      "name": "포트폴리오 팀",
+      "division": "재테크 본부"
+    },
+    {
+      "id": "brief",
+      "name": "브리핑실",
+      "division": "재테크 본부"
+    },
+    {
+      "id": "search",
+      "name": "검색 팀",
+      "division": "부수입 본부",
+      "planned": true
+    },
+    {
+      "id": "edit",
+      "name": "편성·편집 팀",
+      "division": "부수입 본부",
+      "planned": true
+    },
+    {
+      "id": "produce",
+      "name": "제작 팀",
+      "division": "부수입 본부",
+      "planned": true
+    },
+    {
+      "id": "review",
+      "name": "검토·전달 팀",
+      "division": "부수입 본부",
+      "planned": true
+    },
+    {
+      "id": "ops",
+      "name": "운영지원실",
+      "division": "경영지원"
+    }
+  ],
+  "staff": [
+    {
+      "id": "macro",
+      "dept": "macro",
+      "name": "지수현",
+      "role": "지표 분석가",
+      "look": {
+        "skin": 1,
+        "hair": "long",
+        "hairColor": "#2b2220",
+        "top": "cardigan",
+        "topColor": "#8fae9a",
+        "inner": "#f6f1e7",
+        "acc": [
+          "glasses"
+        ]
+      },
+      "mission": "FRED 경제지표 정리"
+    },
+    {
+      "id": "fed",
+      "dept": "macro",
+      "name": "연준호",
+      "role": "연준 리포터",
+      "look": {
+        "skin": 5,
+        "hair": "curly",
+        "hairColor": "#1d1715",
+        "top": "hoodie",
+        "topColor": "#d9a441",
+        "acc": [
+          "headphones",
+          "beard"
+        ]
+      },
+      "mission": "연준 발표·일정 요약"
+    },
+    {
+      "id": "rebal",
+      "dept": "pf",
+      "name": "배분희",
+      "role": "리밸런싱 담당",
+      "look": {
+        "skin": 0,
+        "hair": "bun",
+        "hairColor": "#b5532f",
+        "top": "stripe",
+        "topColor": "#2f4a6b",
+        "stripe": "#f2efe8",
+        "acc": [
+          "earrings"
+        ]
+      },
+      "mission": "ETF 소식·월간 비교"
+    },
+    {
+      "id": "long",
+      "dept": "pf",
+      "name": "장기석",
+      "role": "장기 포트폴리오 담당",
+      "look": {
+        "skin": 3,
+        "hair": "bald",
+        "hairColor": "#2b2220",
+        "top": "denim",
+        "topColor": "#5b7fa6",
+        "inner": "#f0e6d6",
+        "acc": [
+          "beanie",
+          "beard"
+        ],
+        "beanie": "#c9634a"
+      },
+      "mission": "보유 종목 실적·공시"
+    },
+    {
+      "id": "brief",
+      "dept": "brief",
+      "name": "정리나",
+      "role": "브리핑 실장",
+      "look": {
+        "skin": 6,
+        "hair": "afro",
+        "hairColor": "#1a1412",
+        "top": "tee",
+        "topColor": "#e07a5f",
+        "acc": [
+          "earrings"
+        ]
+      },
+      "mission": "브리핑 3종·카톡·상황판"
+    },
+    {
+      "id": "s-board",
+      "dept": "search",
+      "active": true,
+      "schedule": "월·목 아침",
+      "name": "Mina",
+      "role": "보드게임 검색",
+      "look": {
+        "skin": 1,
+        "hair": "ponytail",
+        "hairColor": "#5a3a26",
+        "top": "overall",
+        "topColor": "#7d9bb5",
+        "inner": "#f4d35e",
+        "acc": []
+      },
+      "mission": "월·목 주제 후보 9개"
+    },
+    {
+      "id": "s-kids",
+      "dept": "search",
+      "name": "Leo",
+      "role": "육아 검색",
+      "look": {
+        "skin": 2,
+        "hair": "short",
+        "hairColor": "#d9b56b",
+        "top": "tee",
+        "topColor": "#6c9a8b",
+        "acc": [
+          "glasses"
+        ]
+      },
+      "mission": "육아 자료 검색"
+    },
+    {
+      "id": "s-edu",
+      "dept": "search",
+      "name": "Amara",
+      "role": "교육 검색",
+      "look": {
+        "skin": 5,
+        "hair": "braids",
+        "hairColor": "#1d1715",
+        "top": "hoodie",
+        "topColor": "#b07aa1",
+        "acc": [
+          "earrings"
+        ]
+      },
+      "mission": "교육·논문 검색"
+    },
+    {
+      "id": "c-plan",
+      "dept": "edit",
+      "name": "Noah",
+      "role": "편성 (어느 매체에 언제)",
+      "look": {
+        "skin": 0,
+        "hair": "short",
+        "hairColor": "#a4462a",
+        "top": "cardigan",
+        "topColor": "#c9b79c",
+        "inner": "#ffffff",
+        "acc": [
+          "beard"
+        ]
+      },
+      "mission": "매체별 편성 관리"
+    },
+    {
+      "id": "c-write",
+      "dept": "edit",
+      "active": true,
+      "schedule": "블로그 주제를 고르면 다음 날 아침",
+      "name": "Sofia",
+      "role": "네이버 블로그 편집",
+      "look": {
+        "skin": 2,
+        "hair": "long",
+        "hairColor": "#3b2a20",
+        "top": "stripe",
+        "topColor": "#c0504d",
+        "stripe": "#fbf6ee",
+        "acc": []
+      },
+      "mission": "블로그 초안 (입문자용)"
+    },
+    {
+      "id": "e-boardlife",
+      "dept": "edit",
+      "active": true,
+      "schedule": "보드라이프 주제를 고르면 다음 날 아침",
+      "name": "Elif",
+      "role": "보드라이프 편집",
+      "look": {
+        "skin": 2,
+        "hair": "long",
+        "hairColor": "#7a3b22",
+        "top": "hoodie",
+        "topColor": "#6c8ebf",
+        "acc": [
+          "earrings"
+        ]
+      },
+      "mission": "보드라이프 정보 글"
+    },
+    {
+      "id": "e-wp",
+      "dept": "edit",
+      "name": "Mateo",
+      "role": "워드프레스 편집",
+      "look": {
+        "skin": 3,
+        "hair": "curly",
+        "hairColor": "#1d1715",
+        "top": "tee",
+        "topColor": "#5b8a72",
+        "acc": [
+          "glasses"
+        ]
+      },
+      "mission": "워드프레스 초안"
+    },
+    {
+      "id": "e-cafe",
+      "dept": "edit",
+      "name": "Yuki",
+      "role": "네이버 카페 편집 (부모 대상)",
+      "look": {
+        "skin": 1,
+        "hair": "bun",
+        "hairColor": "#1a1412",
+        "top": "cardigan",
+        "topColor": "#e8b4b8",
+        "inner": "#fbf7f0",
+        "acc": [
+          "earrings"
+        ]
+      },
+      "mission": "카페 글·댓글 답변",
+      "active": true,
+      "schedule": "카페 주제를 고르면 다음 날 아침 · 답글은 요청할 때"
+    },
+    {
+      "id": "c-image",
+      "dept": "produce",
+      "name": "Kenji",
+      "role": "이미지 제작",
+      "look": {
+        "skin": 1,
+        "hair": "buzz",
+        "hairColor": "#222222",
+        "top": "hoodie",
+        "topColor": "#4b4f58",
+        "acc": [
+          "headphones"
+        ]
+      },
+      "mission": "글에 넣을 이미지"
+    },
+    {
+      "id": "c-video",
+      "dept": "produce",
+      "name": "Lucas",
+      "role": "영상 제작",
+      "look": {
+        "skin": 3,
+        "hair": "curly",
+        "hairColor": "#3b2a20",
+        "top": "denim",
+        "topColor": "#6d8fb3",
+        "inner": "#e8e2d6",
+        "acc": [
+          "beanie"
+        ],
+        "beanie": "#e9c46a"
+      },
+      "mission": "짧은 영상"
+    },
+    {
+      "id": "r-check",
+      "dept": "review",
+      "name": "Priya",
+      "role": "검토 (교열 데스크)",
+      "look": {
+        "skin": 4,
+        "hair": "long",
+        "hairColor": "#1d1715",
+        "top": "tee",
+        "topColor": "#8a6fb0",
+        "acc": [
+          "glasses",
+          "earrings"
+        ]
+      },
+      "active": true,
+      "schedule": "초안이 나오면 같은 날 아침",
+      "mission": "초안 점검·외부 감수"
+    },
+    {
+      "id": "r-send",
+      "dept": "review",
+      "name": "Omar",
+      "role": "최종 전달 (카톡 승인)",
+      "look": {
+        "skin": 4,
+        "hair": "short",
+        "hairColor": "#1d1715",
+        "top": "cardigan",
+        "topColor": "#5f7f5f",
+        "inner": "#efe9dc",
+        "acc": [
+          "beard"
+        ]
+      },
+      "mission": "카톡 승인 요청"
+    },
+    {
+      "id": "r-upload",
+      "dept": "review",
+      "name": "Hana",
+      "role": "업로드",
+      "look": {
+        "skin": 3,
+        "hair": "hijab",
+        "hairColor": "#4f6d7a",
+        "top": "tee",
+        "topColor": "#e9c46a",
+        "acc": []
+      },
+      "mission": "워드프레스 자동 업로드"
+    },
+    {
+      "id": "ops-ines",
+      "dept": "ops",
+      "name": "Ines",
+      "role": "운영 실장 (주간 보고)",
+      "active": true,
+      "schedule": "일요일 아침",
+      "look": {
+        "skin": 4,
+        "hair": "short",
+        "hairColor": "#8d8a86",
+        "top": "cardigan",
+        "topColor": "#7a6a8f",
+        "inner": "#f4efe6",
+        "acc": [
+          "glasses",
+          "earrings"
+        ]
+      },
+      "mission": "일요일 주간 보고"
+    }
+  ],
+  "flow": {
+    "columns": [
+      "출근 신호",
+      "모으기",
+      "정리 · 고르기",
+      "쓰기",
+      "검토",
+      "알림 · 게시판",
+      "대표",
+      "매체"
+    ],
+    "lanes": [
+      {
+        "name": "재테크 본부",
+        "from": -0.5,
+        "to": 3.5
+      },
+      {
+        "name": "부수입 본부",
+        "from": 4.1,
+        "to": 8.6
+      },
+      {
+        "name": "경영지원",
+        "from": 8.9,
+        "to": 10.9
+      }
+    ],
+    "nodes": [
+      {
+        "id": "t-daily",
+        "col": 0,
+        "row": 1.5,
+        "kind": "trigger",
+        "title": "매일 06:50",
+        "sub": "당직 알람 (Claude 앱)",
+        "desc": "Claude 앱의 예약 작업이 아침 업무 매뉴얼을 펼쳐요. PC가 꺼져 있거나 앱이 닫혀 있으면 울리지 않아요."
+      },
+      {
+        "id": "macro",
+        "col": 1,
+        "row": 0
+      },
+      {
+        "id": "fed",
+        "col": 1,
+        "row": 1
+      },
+      {
+        "id": "rebal",
+        "col": 1,
+        "row": 2
+      },
+      {
+        "id": "long",
+        "col": 1,
+        "row": 3
+      },
+      {
+        "id": "brief",
+        "col": 2,
+        "row": 1.5
+      },
+      {
+        "id": "kakao-fin",
+        "col": 5,
+        "row": 1,
+        "kind": "out",
+        "title": "카톡 2통",
+        "sub": "[경제 브리핑] · [내 포트폴리오]",
+        "desc": "우편 발송기(scripts\\kakao.ps1)가 카톡 '나와의 채팅'으로 보내요. 1통은 남에게 전달해도 되는 내용, 2통은 나만 보는 포트폴리오."
+      },
+      {
+        "id": "dash",
+        "col": 5,
+        "row": 2.4,
+        "kind": "out",
+        "title": "상황판",
+        "sub": "dashboard-data.js",
+        "desc": "지금 보고 있는 이 화면이에요. 정리나 실장이 매일 아침 게시물을 갈아 끼우고, 일요일에는 Ines가 '사무실 점검' 칸을 고쳐 써요."
+      },
+      {
+        "id": "ceo-read",
+        "col": 6,
+        "row": 1.5,
+        "kind": "ceo",
+        "title": "대표",
+        "sub": "출근길에 브리핑 읽기",
+        "desc": "재테크 본부의 결과물은 브리핑으로 끝나요. 외부 게시는 없어요."
+      },
+      {
+        "id": "t-mt",
+        "col": 0,
+        "row": 5,
+        "kind": "trigger",
+        "title": "월·목 아침",
+        "sub": "주제 회의",
+        "desc": "매일 06:50 아침 업무 안에서, 월요일과 목요일에만 Mina가 일해요."
+      },
+      {
+        "id": "st-plan",
+        "col": 0,
+        "row": 6.4,
+        "kind": "store",
+        "title": "편성표",
+        "sub": "publishing-plan.md",
+        "desc": "매체별 주간 목표와 Mina 후보 수. 숫자는 이 파일에서만 고쳐요. Ines가 일요일에 목표 대비 실제를 비교해요."
+      },
+      {
+        "id": "s-board",
+        "col": 1,
+        "row": 5
+      },
+      {
+        "id": "ceo-pick",
+        "col": 2,
+        "row": 5,
+        "kind": "ceo",
+        "title": "대표 · 주제 고르기",
+        "sub": "\"보드게임 2, 5, 8번\"",
+        "desc": "Mina의 후보 카톡을 보고 갈래마다 0~1개를 골라요. 1~3 블로그, 4~6 보드라이프, 7~9 카페. Code 화면이나 웹 대화에서 말하면 토픽 기록에 '선택'으로 적혀요."
+      },
+      {
+        "id": "t-req",
+        "col": 2,
+        "row": 6.1,
+        "kind": "trigger",
+        "title": "요청 작업",
+        "sub": "\"후기 쓰자\" · \"답글 써줘\"",
+        "desc": "Code 화면에서 직접 시키는 일. 게임을 해 본 뒤 \"Elif, ○○ 후기 쓰자\" → 질문 5개에 답하면 그 답으로만 후기를 써요. 카페에서 본 질문을 붙여넣고 \"Yuki, 답글 써줘\" → 답글 초안 2가지(짧은 것/자세한 것)를 Priya가 빠르게 점검해서 보여 줘요."
+      },
+      {
+        "id": "st-story",
+        "col": 2,
+        "row": 7.2,
+        "kind": "store",
+        "title": "이야기 창고 · 보유 게임",
+        "sub": "my-boardgame-stories.md",
+        "desc": "편집자들이 도입과 마무리에 쓰는 대표님의 진짜 이야기와 보유 게임 목록. 여기에 없는 이야기는 글에 쓰지 않아요. 아직 비어 있어요."
+      },
+      {
+        "id": "c-write",
+        "col": 3,
+        "row": 4.6
+      },
+      {
+        "id": "e-boardlife",
+        "col": 3,
+        "row": 5.6
+      },
+      {
+        "id": "e-cafe",
+        "col": 3,
+        "row": 6.6
+      },
+      {
+        "id": "e-wp",
+        "col": 3,
+        "row": 7.6
+      },
+      {
+        "id": "r-check",
+        "col": 4,
+        "row": 5.6
+      },
+      {
+        "id": "gemini",
+        "col": 4,
+        "row": 6.9,
+        "kind": "ext",
+        "title": "Gemini 외부 감수",
+        "sub": "second-opinion.ps1",
+        "desc": "초안 한 편과 점검 지시문만 보내 두 번째 의견을 받아요. 금고의 다른 열쇠나 포트폴리오는 보내지 않아요. 엄격 등급(부모 대상 논문 글)은 나중에 Perplexity 검증을 붙여요."
+      },
+      {
+        "id": "kakao-side",
+        "col": 5,
+        "row": 5.6,
+        "kind": "out",
+        "title": "카톡 1통",
+        "sub": "[초안 완성] · 검토 판정",
+        "desc": "편집자가 Priya의 고칠 것을 한 번 반영해 최종본(…-final.md)을 만든 뒤 초안마다 한 통씩 보내요."
+      },
+      {
+        "id": "ceo-post",
+        "col": 6,
+        "row": 5.6,
+        "kind": "ceo",
+        "title": "대표 · 확인 후 게시",
+        "sub": "사진 찍기 · 빈칸 채우기",
+        "desc": "최종본을 열어 게시 전 체크리스트(사진, 대표님 칸, 논문 원문 확인)를 채우고 직접 붙여넣어 게시해요. 반응은 reactions.md에 한 줄."
+      },
+      {
+        "id": "m-blog",
+        "col": 7,
+        "row": 4.6,
+        "kind": "media",
+        "title": "네이버 블로그",
+        "sub": "주 2편 목표",
+        "desc": "입문자용 글. 수익은 네이버 자체 광고(애드포스트 등, 확인 필요)."
+      },
+      {
+        "id": "m-bl",
+        "col": 7,
+        "row": 5.6,
+        "kind": "media",
+        "title": "보드라이프",
+        "sub": "정보 글 주 1~2편",
+        "desc": "커뮤니티. 돈보다 신뢰를 쌓는 곳. 외부 링크·홍보는 룰북 확인 전까지 넣지 않아요."
+      },
+      {
+        "id": "m-cafe",
+        "col": 7,
+        "row": 6.6,
+        "kind": "media",
+        "title": "네이버 카페",
+        "sub": "주 1편 · 카페 가입 전",
+        "desc": "유아·초등·청소년 부모가 모이는 네이버 카페. 카페마다 가입 조건과 홍보 규칙이 달라 카페별 규칙 메모(media-rules/cafes/)를 따라요. 아직 가입한 카페가 없어 '공통 버전'으로 써요."
+      },
+      {
+        "id": "m-wp",
+        "col": 7,
+        "row": 7.6,
+        "kind": "media",
+        "title": "워드프레스",
+        "sub": "사이트 개설 후",
+        "desc": "애드센스를 붙일 내 사이트. 개설하면 Mateo가 일을 시작해요.",
+        "planned": true
+      },
+      {
+        "id": "t-sun",
+        "col": 0,
+        "row": 9.4,
+        "kind": "trigger",
+        "title": "일요일 아침",
+        "sub": "주간회의",
+        "desc": "매일 06:50 아침 업무 안에서, 일요일에만 Ines가 일해요."
+      },
+      {
+        "id": "st-logs",
+        "col": 1,
+        "row": 10.4,
+        "kind": "store",
+        "title": "업무 일지 · 기록장",
+        "sub": "usage · token · topic · reactions",
+        "desc": "모든 직원이 일한 뒤 남기는 업무 일지(logs\\usage.md), 토큰 기록, 보드게임 주제 기록, 게시 후 반응 메모."
+      },
+      {
+        "id": "ops-ines",
+        "col": 2,
+        "row": 9.4
+      },
+      {
+        "id": "kakao-ops",
+        "col": 5,
+        "row": 9.4,
+        "kind": "out",
+        "title": "카톡 5줄",
+        "sub": "[주간 보고] · 상황판 점검 칸도",
+        "desc": "성적표, 반복 문제, 토큰, 결재 대기, 다음 주 일정을 다섯 줄로."
+      },
+      {
+        "id": "ceo-week",
+        "col": 6,
+        "row": 9.4,
+        "kind": "ceo",
+        "title": "대표 · 일요일 점검",
+        "sub": "손볼 곳 고르기",
+        "desc": "주간 보고서를 보고 고칠 곳을 고르면, 보존 → 수정 → 개정 이력 → 목록표 순서로 고쳐요."
+      },
+      {
+        "id": "st-cafes",
+        "col": 2,
+        "row": 8.2,
+        "kind": "store",
+        "title": "카페 명부 · 규칙 메모",
+        "sub": "media-rules/cafes/",
+        "desc": "가입했거나 고민 중인 카페 목록과 카페별 규칙(대상 연령, 가입 조건, 홍보·링크 규칙). Yuki는 글마다 카페 하나를 골라 그 규칙을 따라요. \"Yuki, 카페 후보 찾아줘\"로 후보를 모을 수 있어요."
+      }
+    ],
+    "edges": [
+      [
+        "t-daily",
+        "macro"
+      ],
+      [
+        "t-daily",
+        "fed"
+      ],
+      [
+        "t-daily",
+        "rebal"
+      ],
+      [
+        "t-daily",
+        "long"
+      ],
+      [
+        "macro",
+        "brief"
+      ],
+      [
+        "fed",
+        "brief"
+      ],
+      [
+        "rebal",
+        "brief"
+      ],
+      [
+        "long",
+        "brief"
+      ],
+      [
+        "brief",
+        "kakao-fin",
+        "카톡용 2장"
+      ],
+      [
+        "brief",
+        "dash",
+        "오늘 게시물"
+      ],
+      [
+        "kakao-fin",
+        "ceo-read"
+      ],
+      [
+        "t-mt",
+        "s-board"
+      ],
+      [
+        "st-plan",
+        "s-board",
+        "후보 수",
+        "dash"
+      ],
+      [
+        "s-board",
+        "ceo-pick",
+        "후보 9개"
+      ],
+      [
+        "ceo-pick",
+        "c-write",
+        "1~3번"
+      ],
+      [
+        "ceo-pick",
+        "e-boardlife",
+        "4~6번"
+      ],
+      [
+        "ceo-pick",
+        "e-cafe",
+        "7~9번"
+      ],
+      [
+        "ceo-pick",
+        "e-wp",
+        "WP로"
+      ],
+      [
+        "t-req",
+        "e-boardlife",
+        "후기",
+        "dash"
+      ],
+      [
+        "st-story",
+        "c-write",
+        "",
+        "dash"
+      ],
+      [
+        "st-story",
+        "e-boardlife",
+        "",
+        "dash"
+      ],
+      [
+        "st-story",
+        "e-cafe",
+        "",
+        "dash"
+      ],
+      [
+        "c-write",
+        "r-check",
+        "초안"
+      ],
+      [
+        "e-boardlife",
+        "r-check",
+        "초안"
+      ],
+      [
+        "e-cafe",
+        "r-check",
+        "초안"
+      ],
+      [
+        "e-wp",
+        "r-check",
+        "초안"
+      ],
+      [
+        "gemini",
+        "r-check",
+        "두 번째 의견",
+        "dash"
+      ],
+      [
+        "r-check",
+        "kakao-side",
+        "1회 수정"
+      ],
+      [
+        "kakao-side",
+        "ceo-post"
+      ],
+      [
+        "ceo-post",
+        "m-blog",
+        "",
+        "",
+        "c-write"
+      ],
+      [
+        "ceo-post",
+        "m-bl",
+        "",
+        "",
+        "e-boardlife"
+      ],
+      [
+        "ceo-post",
+        "m-cafe",
+        "",
+        "",
+        "e-cafe"
+      ],
+      [
+        "ceo-post",
+        "m-wp",
+        "",
+        "",
+        "e-wp"
+      ],
+      [
+        "t-sun",
+        "ops-ines"
+      ],
+      [
+        "st-logs",
+        "ops-ines",
+        "읽기",
+        "dash"
+      ],
+      [
+        "ops-ines",
+        "kakao-ops",
+        "주간 보고서"
+      ],
+      [
+        "kakao-ops",
+        "ceo-week"
+      ],
+      [
+        "t-req",
+        "e-cafe",
+        "답글",
+        "dash"
+      ],
+      [
+        "st-cafes",
+        "e-cafe",
+        "카페 규칙",
+        "dash"
+      ]
+    ]
+  }
+};
+
+</script>
+<script>
+window.OFFICE_PUBLIC = true;
+window.OFFICE_TODAY = {"date":"2026-10-30","run":{"start":"06:50","end":"06:55","mode":"예약 실행","minutes":5},"staff":{"macro":{"status":"ok","time":"06:51","file":"macro.md","headline":"FRED 지표 13개 모두 조회","items":["새로 반영 6개: 금리차 2종, 기준금리, 실질금리, 근원 PCE(9월), 실질 GDP(3분기)","10년-2년 금리차 0.38 → 0.37%p, 10년-3개월 0.87 → 0.80%p","테일러 룰: 이번 달 완료(6.21%), 새 입력 재계산 6.53% vs 3.88%","환율 3종은 10/23 값 그대로 (FRED 반영 지연)"]},"fed":{"status":"ok","time":"06:52","file":"fed.md","headline":"특이사항 없음 (새 발표 없음)","items":["10/28 성명서 이후 새 성명서·의사록·연설 없음","10월 의사록 미게시","다음: 베이지북 11/25, FOMC 12/8~9"]},"rebal":{"status":"ok","time":"06:53","file":"","headline":"포트폴리오 업무 (내용은 집 PC 상황판에서만 보여요)","items":null},"long":{"status":"warn","time":"06:53","file":"","headline":"포트폴리오 업무 (내용은 집 PC 상황판에서만 보여요)","items":null},"brief":{"status":"ok","time":"06:54","file":"briefing-*.md","headline":"브리핑 3종·카톡 2통 작성, 검사 통과","items":["공유용·카톡1에 포트폴리오 내용 없음 확인","관심 종목·관심 ETF 미포함 확인","막힌 것: 카톡 2통째(포트폴리오) 미발송, 대신 파일 경로 글자가 감"]}},"kpis":[{"label":"미국 기준금리","value":"3.75~4.00%","delta":"10/28 FOMC 동결 · 실효 3.88%"},{"label":"장단기금리차 10Y-2Y","value":"0.37%p","delta":"−0.01 · 10/29"},{"label":"WTI 유가","value":"$103.37","delta":"−1.88 · 10/27"},{"label":"원/달러","value":"1,325.06원","delta":"−1.17 · 10/23"}],"briefs":{"share":"# 경제 브리핑 — 10/30\n\n1. 미국 근원 PCE 물가지수(9월)가 새로 반영됐습니다. 전년 같은 달보다 3.12% 높습니다. (FRED PCEPILFE, 10/29 반영)\n2. 장단기금리차가 다시 좁아졌습니다. 10년-2년 0.38→0.37%p, 10년-3개월 0.87→0.80%p. (FRED, 10/29)\n3. 10년물 실질금리는 2.64→2.67%로 올랐고, 실효 기준금리는 3.88% 그대로입니다. (FRED, 10/28)\n4. 새 근원 PCE와 3분기 GDP를 넣은 테일러 룰 적정금리는 6.53%로, 실효 기준금리 3.88%보다 2.65%p 높습니다. (FRED, 10/29 반영)\n5. 연준은 10/28 성명서 이후 새 발표가 없습니다. 다음은 10월 의사록(미게시), 베이지북 11/25, FOMC 12/8~9. WTI $103.37(10/27), 원/달러 1,325원(10/23)은 새 반영 없이 그대로입니다. (연준, FRED)\n\n※ 정리용 자료이며 투자 권유가 아닙니다.","short":"# 경제 브리핑 — 10/30\n\n1. 미국 근원 PCE 물가지수(9월)가 새로 반영됐습니다. 전년 같은 달보다 3.12% 높습니다. (FRED PCEPILFE, 10/29 반영)\n2. 장단기금리차가 다시 좁아졌습니다. 10년-2년 0.38→0.37%p, 10년-3개월 0.87→0.80%p. (FRED, 10/29)\n3. 10년물 실질금리는 2.64→2.67%로 올랐고, 실효 기준금리는 3.88% 그대로입니다. (FRED, 10/28)\n4. 새 근원 PCE와 3분기 GDP를 넣은 테일러 룰 적정금리는 6.53%로, 실효 기준금리 3.88%보다 2.65%p 높습니다. (FRED, 10/29 반영)\n5. 연준은 10/28 성명서 이후 새 발표가 없습니다. 다음은 10월 의사록(미게시), 베이지북 11/25, FOMC 12/8~9. WTI $103.37(10/27), 원/달러 1,325원(10/23)은 새 반영 없이 그대로입니다. (연준, FRED)\n\n※ 정리용 자료이며 투자 권유가 아닙니다.","full":"# 경제 브리핑 — 10/30\n\n1. 미국 근원 PCE 물가지수(9월)가 새로 반영됐습니다. 전년 같은 달보다 3.12% 높습니다. (FRED PCEPILFE, 10/29 반영)\n2. 장단기금리차가 다시 좁아졌습니다. 10년-2년 0.38→0.37%p, 10년-3개월 0.87→0.80%p. (FRED, 10/29)\n3. 10년물 실질금리는 2.64→2.67%로 올랐고, 실효 기준금리는 3.88% 그대로입니다. (FRED, 10/28)\n4. 새 근원 PCE와 3분기 GDP를 넣은 테일러 룰 적정금리는 6.53%로, 실효 기준금리 3.88%보다 2.65%p 높습니다. (FRED, 10/29 반영)\n5. 연준은 10/28 성명서 이후 새 발표가 없습니다. 다음은 10월 의사록(미게시), 베이지북 11/25, FOMC 12/8~9. WTI $103.37(10/27), 원/달러 1,325원(10/23)은 새 반영 없이 그대로입니다. (연준, FRED)\n\n※ 정리용 자료이며 투자 권유가 아닙니다."},"runs":[{"at":"10/30 06:55","mode":"예약","ok":4,"warn":1,"bad":0,"minutes":5},{"at":"10/29 06:57","mode":"예약","ok":4,"warn":1,"bad":0,"minutes":7},{"at":"10/28 23:25","mode":"예약 시험","ok":4,"warn":1,"bad":0,"minutes":7},{"at":"10/28 22:59","mode":"수동","ok":4,"warn":1,"bad":0,"minutes":3}],"checks":[{"status":"ok","text":"매일 06:50 예약 작업 작동 중"},{"status":"warn","text":"장기석 \u0027부분 성공\u0027 4회 연속 (오늘은 ○○ 시간외 미확인)"},{"status":"ok","text":"토큰 사용량(10/29 아침 업무): 합계 3,426,901"},{"status":"warn","text":"카카오톡: 실제 1/2통 (kakao-1만 감, kakao-2 미발송). 재로그인 불필요"}]};
+</script>
+<script>
+/* 외부용 상황판(게시판의 office/)이면 true: 결재함·포트폴리오 브리핑·책상 추가를 숨긴다 */
+const PUBLIC = !!window.OFFICE_PUBLIC;
+/* 명부(dashboard-staff.js)와 오늘의 게시물(dashboard-data.js)을 합친다 */
+const OFFICE_DATA = (() => {
+  const R = window.OFFICE_STAFF || { ceo:{ name:"대표", look:{} }, departments:[], staff:[] };
+  const T = window.OFFICE_TODAY || null;
+  const empty = { date:"-", run:{ start:"-", end:"-", mode:"게시물 없음", minutes:0 }, staff:{}, kpis:[], briefs:{ share:"오늘 게시물이 아직 없어요.", short:"오늘 게시물이 아직 없어요.", full:"오늘 게시물이 아직 없어요." }, runs:[], checks:[{ status:"warn", text:"dashboard-data.js 를 찾지 못했어요. 아침 업무 기록을 확인해 주세요." }] };
+  const t = T || empty, plannedDept = new Set(R.departments.filter(d => d.planned).map(d => d.id));
+  return { ...t, ceo:R.ceo, departments:R.departments,
+    staff: R.staff.map(s => ({ ...s, ...(t.staff[s.id] || { status: s.active ? "idle" : plannedDept.has(s.dept) ? "plan" : "idle" }) })) };
+})();
+/* ===== 상황판 틀: 아래는 매일 바뀌지 않는다 ===== */
+const S = { ok:["완료","ok"], warn:["일부 막힘","warn"], bad:["실패","bad"], work:["일하는 중","idle"], idle:["대기","idle"], new:["새 책상","idle"], plan:["준비 중","idle"] };
+const ST_COLOR = { ceo:"#3f6b55", ok:"#2f8f5b", warn:"#b7791f", bad:"#c0392b", work:"#4a6fa5", idle:"#8a877f", new:"#8a877f", plan:"#8a7a5c" };
+const ST_BG = { ceo:"#e2efe6", ok:"#e9f6ee", warn:"#fdf3e1", bad:"#fbe7e4", work:"#e6eef8", idle:"#f1efea", new:"#f1efea", plan:"#f6f0e4" };
+const SCREEN = { ok:"#86dcae", warn:"#f6cf74", bad:"#f39a8e", work:"#9cc3f0", idle:"#c9c5bb", new:"#c9c5bb", plan:"#dfe7d6", empty:"#d9d4ca" };
+const ACTIVE = ["ok","warn","bad","work"];
+const SKIN = ["#f9dcc4","#f1c7a1","#e3b28a","#c98e62","#a86f47","#7d4f30","#5b3822"];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+let previews = [], selId = "ceo", phaseMode = "auto", lookTimer = null;
+
+const C = {
+  floor:"#eddcc0", plank:"#e0cba8", base1:"#d2b88f", base2:"#c3a67a",
+  frame:"#fbfaf6", frameS:"#efebe3", frameT:"#e6e0d4",
+  rug:{ exec:["#ecd3c1","#d9b39b"], lounge:["#ebe4d6","#d3c6ad"], garden:["#e1ebdc","#c1d3bc"], fin:["#dfe8e0","#c3d3c6"], side:["#f1e8d8","#cdb98f"] },
+  deskT:"#f6e7cd", deskL:"#e3cba6", deskR:"#d3b68d",
+  execT:"#c49470", execL:"#a47552", execR:"#8f6446",
+  white:"#f7f5f0", whiteL:"#e9e5dc", whiteR:"#dbd6cb",
+  mon:"#3d4148", monS:"#2f3237",
+  pot:"#dc9068", potL:"#c97a55", potR:"#b86d4b", potW:"#f4f1ea", potWL:"#e3ded3", potWR:"#d4cec2", potG:"#b9b3a6", potGL:"#a59f92", potGR:"#948e82",
+  g1:"#5c9a69", g2:"#4b8a5a", g3:"#78b183", g4:"#3d7650", g5:"#8cbf8f",
+  blush:"#f2a99c", chair:"#ebe5d9", chairS:"#d9d1c2"
+};
+const SKY = { day:["#cfe7f2","#eaf5f9"], dusk:["#f2b98f","#f8dcc0"], night:["#1f2d50","#34497a"] };
+
+/* ----- 사시도 기본 도구 ----- */
+const TW = 44, TH = 22, ZH = 26;
+const P = (x, y, z=0) => [ (x - y) * TW / 2, (x + y) * TH / 2 - z * ZH ];
+const f1 = n => (+n).toFixed(1);
+const pts = a => a.map(p => p.map(f1).join(",")).join(" ");
+const poly = (a, fill, extra="") => `<polygon points="${pts(a)}" fill="${fill}" ${extra}/>`;
+function box(x, y, z, w, d, h, top, left, right, edge=true) {
+  const e = edge ? `stroke="rgba(255,255,255,.55)" stroke-width="1" stroke-linejoin="round"` : "";
+  return poly([P(x,y+d,z+h),P(x+w,y+d,z+h),P(x+w,y+d,z),P(x,y+d,z)], left) +
+         poly([P(x+w,y,z+h),P(x+w,y+d,z+h),P(x+w,y+d,z),P(x+w,y,z)], right) +
+         poly([P(x,y,z+h),P(x+w,y,z+h),P(x+w,y+d,z+h),P(x,y+d,z+h)], top, e);
+}
+const shadow = (x, y, w, d) => { const [cx, cy] = P(x + w / 2, y + d / 2); return `<ellipse cx="${f1(cx)}" cy="${f1(cy)}" rx="${f1((w + d) * TW / 4 + 4)}" ry="${f1((w + d) * TH / 4 + 2)}" fill="rgba(110,80,50,.12)"/>`; };
+const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); const c = [n >> 16, n >> 8 & 255, n & 255].map(v => Math.max(0, Math.min(255, Math.round(v * k)))); return "#" + c.map(v => v.toString(16).padStart(2, "0")).join(""); };
+
+/* ----- 식물 (북유럽 톤: 흰·회색 화분 위주) ----- */
+function leafBall(cx, cy, r, cols) { return cols.map((c, i) => { const a = i * 2.1; return `<circle cx="${f1(cx + Math.cos(a) * r * .55)}" cy="${f1(cy + Math.sin(a) * r * .35 - r * .2)}" r="${f1(r * (0.62 - i * .04))}" fill="${c}"/>`; }).join(""); }
+function potBox(x, y, s, h, kind) { const k = { t:[C.pot, C.potL, C.potR], w:[C.potW, C.potWL, C.potWR], g:[C.potG, C.potGL, C.potGR] }[kind || "w"]; return shadow(x, y, s, s) + box(x, y, 0, s, s, h, ...k); }
+function monstera(x, y, size=1, kind="w") {
+  const [cx, cy] = P(x + .35, y + .35, .55); let leaves = "";
+  for (const [dx, dy, rot] of [[-11,-18,-35],[10,-21,30],[-2,-28,-5],[-15,-8,-60],[14,-9,55],[2,-15,10]])
+    leaves += `<g transform="translate(${f1(cx + dx * size)},${f1(cy + dy * size)}) rotate(${rot}) scale(${f1(size * .85)})"><path d="M0,0 C-9,-4 -10,-15 0,-20 C10,-15 9,-4 0,0Z" fill="${C.g2}"/><path d="M0,-1 L0,-18" stroke="${C.g4}" stroke-width="1"/><path d="M-6,-8 L-2,-9 M6,-11 L2,-12" stroke="${C.g1}" stroke-width="1.6"/></g>`;
+  return potBox(x, y, .7, .55, kind) + `<g class="leaf-sway">${leaves}</g>`;
+}
+function bushPot(x, y, s=.5, h=.4, kind="w") { const [cx, cy] = P(x + s / 2, y + s / 2, h); return potBox(x, y, s, h, kind) + leafBall(cx, cy - 4, 15 * s / .5, [C.g4, C.g2, C.g1, C.g3]); }
+function tallTree(x, y, kind="g") {
+  const [cx, cy] = P(x + .3, y + .3, .5);
+  return potBox(x, y, .6, .5, kind) + `<rect x="${f1(cx - 1.5)}" y="${f1(cy - 46)}" width="3" height="46" rx="1.5" fill="#8a6a4a"/>` +
+    `<g class="leaf-sway">${leafBall(cx, cy - 58, 22, [C.g4, C.g2, C.g1, C.g3, C.g2])}</g>`;
+}
+function fiddle(x, y) {
+  const [cx, cy] = P(x + .3, y + .3, .5); let l = "";
+  for (let i = 0; i < 9; i++) { const yy = cy - 18 - i * 6, side = i % 2 ? 1 : -1; l += `<ellipse cx="${f1(cx + side * 7)}" cy="${f1(yy)}" rx="7" ry="5" transform="rotate(${side * 25} ${f1(cx + side * 7)} ${f1(yy)})" fill="${i % 3 ? C.g2 : C.g4}"/>`; }
+  return potBox(x, y, .6, .5, "w") + `<rect x="${f1(cx - 1.2)}" y="${f1(cy - 66)}" width="2.4" height="66" fill="#7d6247"/><g class="leaf-sway">${l}</g>`;
+}
+function snake(x, y) {
+  const [cx, cy] = P(x + .25, y + .25, .45); let l = "";
+  for (const [dx, h, c] of [[-5,30,C.g4],[-1,40,C.g2],[3,34,C.g1],[6,26,C.g4],[0,22,C.g3]]) l += `<path d="M${f1(cx + dx - 3)},${f1(cy)} Q${f1(cx + dx)},${f1(cy - h)} ${f1(cx + dx + .5)},${f1(cy - h - 4)} Q${f1(cx + dx + 2)},${f1(cy - h)} ${f1(cx + dx + 3)},${f1(cy)}Z" fill="${c}"/>`;
+  return potBox(x, y, .5, .45, "g") + l;
+}
+function hangingPlant(x, y, z, len=36) {
+  const [cx, cy] = P(x, y, z); let vines = "";
+  for (const [dx, l] of [[-6, len], [0, len * .7], [6, len * .9]]) {
+    vines += `<path d="M${f1(cx + dx * .4)},${f1(cy + 8)} Q${f1(cx + dx)},${f1(cy + 8 + l / 2)} ${f1(cx + dx * 1.2)},${f1(cy + 8 + l)}" stroke="${C.g4}" stroke-width="1.2" fill="none"/>`;
+    for (let k = 1; k <= 4; k++) vines += `<ellipse cx="${f1(cx + dx * (0.4 + k * .2) + (k % 2 ? 3 : -3))}" cy="${f1(cy + 8 + l * k / 4.4)}" rx="3.2" ry="2.2" fill="${k % 2 ? C.g1 : C.g3}"/>`;
+  }
+  return `<line x1="${f1(cx)}" y1="${f1(cy - 30)}" x2="${f1(cx)}" y2="${f1(cy)}" stroke="#b9ad97" stroke-width="1"/>` +
+    `<path d="M${f1(cx - 9)},${f1(cy)} L${f1(cx + 9)},${f1(cy)} L${f1(cx + 7)},${f1(cy + 10)} L${f1(cx - 7)},${f1(cy + 10)}Z" fill="${C.potW}"/><g class="leaf-sway">${vines}</g>`;
+}
+function plantLadder(x, y) {
+  const [a1x, a1y] = P(x, y + .5, 0), [a2x, a2y] = P(x + .3, y, 1.8), [b1x, b1y] = P(x + 1.4, y + .5, 0), [b2x, b2y] = P(x + 1.7, y, 1.8);
+  let s = `<line x1="${f1(a1x)}" y1="${f1(a1y)}" x2="${f1(a2x)}" y2="${f1(a2y)}" stroke="#c9a77c" stroke-width="3"/><line x1="${f1(b1x)}" y1="${f1(b1y)}" x2="${f1(b2x)}" y2="${f1(b2y)}" stroke="#c9a77c" stroke-width="3"/>`;
+  for (const [t, cols] of [[.25,[C.g2,C.g3]],[.55,[C.g4,C.g1]],[.85,[C.g1,C.g5]]]) {
+    const z = t * 1.8, yy = y + .5 - t * .5, xx = x + t * .3;
+    s += box(xx, yy - .15, z, 1.4, .3, .05, "#d8b88b", "#c9a77c", "#b9976c", false);
+    for (let k = 0; k < 2; k++) { const [px, py] = P(xx + .35 + k * .7, yy, z + .05); s += `<rect x="${f1(px - 4)}" y="${f1(py - 7)}" width="8" height="7" rx="1.5" fill="${k ? C.potW : C.pot}"/>` + leafBall(px, py - 10, 7, cols); }
+  }
+  return s;
+}
+
+/* ----- 조명 ----- */
+const lightPool = (x, y, r=2.4) => { const [cx, cy] = P(x, y); return `<ellipse class="pool" cx="${f1(cx)}" cy="${f1(cy)}" rx="${f1(r * TW / 2)}" ry="${f1(r * TH / 2)}" fill="url(#poolGrad)"/>`; };
+function floorLamp(x, y) {
+  const [bx, by] = P(x, y), [tx, ty] = P(x, y, 2.1);
+  return `<ellipse cx="${f1(bx)}" cy="${f1(by)}" rx="8" ry="4" fill="#3d3d3d"/><line x1="${f1(bx)}" y1="${f1(by)}" x2="${f1(tx)}" y2="${f1(ty)}" stroke="#3d3d3d" stroke-width="2"/>` +
+    `<path d="M${f1(tx - 12)},${f1(ty + 6)} L${f1(tx - 7)},${f1(ty - 8)} L${f1(tx + 7)},${f1(ty - 8)} L${f1(tx + 12)},${f1(ty + 6)}Z" fill="#f3ead8" stroke="#ddd0b8"/>`;
+}
+
+/* ----- 사람: 다양한 피부색·머리·옷·소품 (앞모습 / 뒷모습) ----- */
+function chibi(m, cx, cy, s, look, opts={}) {
+  const L = m.look || {}, st = m.status || "idle", uid = (m.id || "x").replace(/[^a-z0-9]/gi, "") + Math.round(cx);
+  const skin = SKIN[L.skin ?? 1], hc = L.hairColor || "#2b2220", tc = L.topColor || "#8fae9a", inner = L.inner || "#f4efe6";
+  const acc = L.acc || [], has = a => acc.includes(a), hair = L.hair || "short", top = L.top || "tee";
+  const back = opts.back, pose = opts.pose || "";
+  const T = "M-12.5,6 Q-14,-19 0,-21 Q14,-19 12.5,6Z";
+  /* 머리 뒤쪽 */
+  let hb = "";
+  if (hair === "long") hb = `<path d="M-15,-34 Q-16,-50 0,-50 Q16,-50 15,-34 L15,-15 Q0,-11 -15,-15Z" fill="${hc}"/>`;
+  if (hair === "afro") hb = `<circle cx="0" cy="-38" r="19" fill="${hc}"/><circle cx="-14" cy="-29" r="8" fill="${hc}"/><circle cx="14" cy="-29" r="8" fill="${hc}"/>`;
+  if (hair === "curly") hb = `<circle cx="0" cy="-41" r="14.5" fill="${hc}"/>` + [[-12,-38],[12,-38],[-7,-50],[7,-50],[0,-53],[-14,-30],[14,-30]].map(([a, b]) => `<circle cx="${a}" cy="${b}" r="6" fill="${hc}"/>`).join("");
+  if (hair === "braids") hb = `<rect x="-17" y="-36" width="5" height="26" rx="2.5" fill="${hc}"/><rect x="12" y="-36" width="5" height="26" rx="2.5" fill="${hc}"/>` + [-30,-24,-18].map(v => `<circle cx="-14.5" cy="${v}" r="1" fill="#e9c46a"/><circle cx="14.5" cy="${v}" r="1" fill="#e9c46a"/>`).join("");
+  if (hair === "ponytail") hb = `<ellipse cx="15" cy="-38" rx="6" ry="11" transform="rotate(25 15 -38)" fill="${hc}"/>`;
+  if (hair === "hijab") hb = `<path d="M-17,-31 Q-18,-53 0,-53 Q18,-53 17,-31 Q18,-12 10,-10 L-10,-10 Q-18,-12 -17,-31Z" fill="${hc}"/>`;
+  const faceR = hair === "hijab" ? 11.5 : 13.5;
+  /* 머리 앞쪽 */
+  const caps = {
+    short:`<path d="M-13.5,-32 Q-15,-50 0,-49 Q15,-50 13.5,-32 Q9,-42 0,-41 Q-9,-42 -13.5,-32Z" fill="${hc}"/>`,
+    long:`<path d="M-14,-30 Q-16,-51 0,-50 Q16,-51 14,-30 L12,-22 Q10,-38 0,-41 Q-10,-38 -12,-22Z" fill="${hc}"/>`,
+    bun:`<path d="M-13.5,-33 Q-14,-49 0,-48 Q14,-49 13.5,-33 Q6,-44 -4,-39 Q-9,-41 -13.5,-33Z" fill="${hc}"/><circle cx="0" cy="-50" r="6" fill="${hc}"/>`,
+    afro:`<path d="M-12,-36 Q0,-46 12,-36 Q6,-41 0,-41 Q-6,-41 -12,-36Z" fill="${hc}"/>`,
+    curly:`<path d="M-13,-34 Q0,-48 13,-34 Q7,-40 0,-39 Q-7,-40 -13,-34Z" fill="${hc}"/>`,
+    braids:`<path d="M-13.5,-32 Q-15,-50 0,-49 Q15,-50 13.5,-32 Q7,-43 1,-42 L0,-46 L-1,-42 Q-7,-43 -13.5,-32Z" fill="${hc}"/>`,
+    ponytail:`<path d="M-13.5,-32 Q-15,-50 0,-49 Q15,-50 13.5,-32 Q9,-40 0,-42 Q-9,-40 -13.5,-32Z" fill="${hc}"/>`,
+    buzz:`<path d="M-13.5,-35 Q-13,-48 0,-47.5 Q13,-48 13.5,-35 Q7,-41 0,-41 Q-7,-41 -13.5,-35Z" fill="${hc}" opacity=".85"/>`,
+    hijab:`<path d="M-12,-36 Q0,-49 12,-36 Q8,-43 0,-44 Q-8,-43 -12,-36Z" fill="${hc}"/>`,
+    bald:""
+  };
+  let topAcc = "";
+  if (has("beanie")) topAcc += `<path d="M-14.5,-37 Q-15,-55 0,-55 Q15,-55 14.5,-37Z" fill="${L.beanie || "#c9634a"}"/><rect x="-15.5" y="-40" width="31" height="6" rx="3" fill="${shade(L.beanie || "#c9634a", .82)}"/><circle cx="0" cy="-56" r="3.5" fill="${shade(L.beanie || "#c9634a", 1.1)}"/>`;
+  if (has("headphones")) topAcc += `<path d="M-15,-33 Q-16,-55 0,-55 Q16,-55 15,-33" stroke="#3a3a3a" stroke-width="3" fill="none"/><rect x="-19" y="-38" width="7" height="11" rx="3.5" fill="#3a3a3a"/><rect x="12" y="-38" width="7" height="11" rx="3.5" fill="#3a3a3a"/>`;
+  /* 옷 */
+  let torso = `<path d="${T}" fill="${top === "overall" ? inner : tc}"/>`, under = "";
+  if (top === "tee") torso += `<path d="M-4.5,-20.5 Q0,-15 4.5,-20.5" stroke="${shade(tc, .8)}" stroke-width="1.4" fill="none"/>`;
+  if (top === "hoodie") { under = `<path d="M-12,-21 Q0,-30 12,-21 Q8,-14 0,-14 Q-8,-14 -12,-21Z" fill="${shade(tc, .85)}"/>`; torso += `<path d="M-2.5,-18 v8 M2.5,-18 v8" stroke="#f4efe6" stroke-width="1.2"/><path d="M-7,-2 h14 v5 h-14z" fill="${shade(tc, .9)}"/>`; }
+  if (top === "cardigan") torso += `<path d="M-4.5,-20 L4.5,-20 L3.5,6 L-3.5,6Z" fill="${inner}"/><circle cx="-5.5" cy="-8" r="1" fill="${shade(tc, .7)}"/><circle cx="-5.5" cy="-1" r="1" fill="${shade(tc, .7)}"/>`;
+  if (top === "stripe") torso += `<clipPath id="cp${uid}"><path d="${T}"/></clipPath><g clip-path="url(#cp${uid})">${[-16,-10,-4,2].map(v => `<rect x="-15" y="${v}" width="30" height="2.6" fill="${L.stripe || "#f2efe8"}"/>`).join("")}</g>`;
+  if (top === "denim") torso += `<path d="M-4,-20 L4,-20 L3,6 L-3,6Z" fill="${inner}"/><path d="M-4,-20 L-8,-14 L-3,-12Z M4,-20 L8,-14 L3,-12Z" fill="${shade(tc, 1.12)}"/><path d="M-10,-6 h5 M5,-6 h5" stroke="${shade(tc, .75)}" stroke-width="1"/>`;
+  if (top === "overall") torso += `<rect x="-8" y="-12" width="16" height="18" rx="3" fill="${tc}"/><path d="M-6,-12 L-9,-20 M6,-12 L9,-20" stroke="${tc}" stroke-width="2.5"/><circle cx="-5.5" cy="-10" r="1.1" fill="#e9c46a"/><circle cx="5.5" cy="-10" r="1.1" fill="#e9c46a"/>`;
+  if (back) { torso = `<path d="${T}" fill="${tc}"/><path d="M-10,-17 Q0,-21 10,-17" stroke="${shade(tc, .85)}" stroke-width="1.4" fill="none"/>`; under = ""; }
+  const sleeve = top === "overall" ? inner : top === "cardigan" || top === "denim" || top === "hoodie" ? tc : tc;
+  const arm = (cls, x, rot) => `<g class="${cls}" ${rot ? `transform="rotate(${rot} ${x + 3.5} -15)"` : ""}><rect x="${x}" y="-15" width="7" height="15" rx="3.5" fill="${sleeve}"/><circle class="hand" cx="${x + 3.5}" cy="0" r="3.2" fill="${skin}"/></g>`;
+  const arms = pose === "cheer" ? arm("armL", -16, 160) + arm("armR", 9, -160) : pose === "think" ? arm("armL", -16, 0) + arm("armR", 9, -150) : arm("armL", -16, 0) + arm("armR", 9, 0);
+  /* 얼굴 */
+  const beard = has("beard") ? `<path d="M-11,-31 Q-12,-18 0,-17 Q12,-18 11,-31 Q8,-24 0,-24.5 Q-8,-24 -11,-31Z" fill="${hc === "#d9b56b" ? hc : hc}"/>` : "";
+  const mouthC = has("beard") ? "#f0d2bd" : "#a5634f";
+  const glasses = has("glasses") ? `<circle cx="-4.6" cy="-31.5" r="3.8" fill="none" stroke="#2f2a26" stroke-width="1.2"/><circle cx="4.6" cy="-31.5" r="3.8" fill="none" stroke="#2f2a26" stroke-width="1.2"/><path d="M-0.8,-31.5 h1.6" stroke="#2f2a26" stroke-width="1.2"/>` : "";
+  const ears = has("earrings") ? `<circle cx="${-faceR + .5}" cy="-26" r="1.6" fill="#e9c46a"/><circle cx="${faceR - .5}" cy="-26" r="1.6" fill="#e9c46a"/>` : "";
+  const face = back
+    ? `<circle cx="0" cy="-33" r="13.5" fill="${skin}"/>` + (hair === "bald" ? "" : hair === "hijab" ? `<circle cx="0" cy="-34" r="16" fill="${hc}"/>` : `<path d="M-14,-30 Q-15,-50 0,-50 Q15,-50 14,-30 Q14,-22 0,-21 Q-14,-22 -14,-30Z" fill="${hc}"/>`) + topAcc
+    : `${hb}<circle cx="0" cy="-33" r="${faceR}" fill="${skin}"/>${ears}${caps[hair] ?? caps.short}${topAcc}
+       <g class="eyes"><g class="open blink"><ellipse cx="-4.6" cy="-31.5" rx="1.7" ry="2.2" fill="#2a211d"/><ellipse cx="4.6" cy="-31.5" rx="1.7" ry="2.2" fill="#2a211d"/></g>
+       <path class="closed" d="M-7,-31 q2.4,2 4.8,0 M2.2,-31 q2.4,2 4.8,0" stroke="#2a211d" stroke-width="1.3" fill="none"/></g>${glasses}
+       <circle cx="-8" cy="-27" r="2.4" fill="${C.blush}" opacity="${(L.skin ?? 1) > 3 ? .35 : .6}"/><circle cx="8" cy="-27" r="2.4" fill="${C.blush}" opacity="${(L.skin ?? 1) > 3 ? .35 : .6}"/>${beard}
+       <path d="M-2.2,-26.3 Q0,${st === "bad" ? "-27.6" : pose === "cheer" ? "-23.2" : "-24.6"} 2.2,-26.3" stroke="${mouthC}" stroke-width="1.2" fill="none" stroke-linecap="round"/>`;
+  let accSt = "";
+  if (!back && !opts.decor) {
+    if (st === "ok") accSt = `<g transform="translate(14,-12)"><rect x="-3.5" y="-6" width="7" height="8" rx="2" fill="#f7f4ee" stroke="#d9d2c4"/><path d="M3.5,-4 q3,1 0,4" stroke="#d9d2c4" fill="none"/><g class="steam"><path d="M-1,-9 q-2,-3 0,-6 q2,-3 0,-6" stroke="#b9b2a5" stroke-width="1.2" fill="none"/><path d="M2,-9 q-2,-3 0,-6 q2,-3 0,-6" stroke="#b9b2a5" stroke-width="1.2" fill="none"/></g></g>`;
+    if (st === "warn") accSt = `<g class="mark"><circle cx="16" cy="-58" r="8" fill="#fff4d8" stroke="#e7b54d"/><text x="16" y="-54" text-anchor="middle" font-size="11" font-weight="800" fill="#b7791f">?</text></g>`;
+    if (st === "bad") accSt = `<g class="mark"><ellipse cx="0" cy="-64" rx="11" ry="5" fill="#cfd5de"/><circle cx="-5" cy="-66" r="5" fill="#cfd5de"/><circle cx="4" cy="-67" r="6" fill="#cfd5de"/><path d="M-5,-58 l-2,5 M0,-58 l-2,5 M5,-58 l-2,5" stroke="#8fa4c4" stroke-width="1.2"/></g>`;
+    if (st === "new") accSt = `<g class="spark"><path d="M17,-54 l2,5 5,2 -5,2 -2,5 -2,-5 -5,-2 5,-2z" fill="#f6cf74"/></g>`;
+    if (st === "plan") accSt = `<g class="spark"><path d="M17,-52 q-6,-2 -6,-8 q6,0 6,8z" fill="${C.g3}"/><path d="M17,-52 q6,-3 7,-9 q-7,1 -7,9z" fill="${C.g1}"/><path d="M17,-52 v5" stroke="${C.g1}" stroke-width="1.4"/></g>`;
+  }
+  const cards = opts.cards ? `<g transform="translate(13,-40)">${[-12,-4,4].map((r, i) => `<rect x="-4" y="-10" width="8" height="11" rx="1.5" transform="rotate(${r * 1.6} 0 2)" fill="${["#fbf7ef","#f6efe0","#fbf7ef"][i]}" stroke="#d6cbb5"/>`).join("")}</g>` : "";
+  const chair = opts.noChair ? "" : `<rect x="-16" y="-44" width="32" height="40" rx="11" fill="${C.chairS}"/><rect x="-14" y="-42" width="28" height="36" rx="10" fill="${C.chair}"/>`;
+  const classes = `chibi st-${opts.decor ? "decor" : st}${pose === "cheer" ? " cheer" : ""}`;
+  return `<g class="${classes}" style="--look:${look.rot}deg;--eye:${look.eye}px" transform="translate(${f1(cx)},${f1(cy)}) scale(${s})">
+    ${back ? "" : chair}<g class="torso">${under}${torso}${back ? "" : arms}<g class="head">${face}</g>${back ? arms : ""}</g>${back ? `<rect x="-15" y="-10" width="30" height="18" rx="8" fill="${C.chairS}"/><rect x="-13" y="-8" width="26" height="14" rx="7" fill="${C.chair}"/>` : ""}${cards}${accSt}</g>`;
+}
+
+function bubble(cx, top, st, label) {
+  const w = [...label].reduce((a, c) => a + (c.charCodeAt(0) > 255 ? 11.5 : 6.8), 0) + 16, h = 20;
+  const x = cx - w / 2, y = top - h - 7;
+  return `<g class="bub"><rect x="${f1(x)}" y="${f1(y)}" width="${f1(w)}" height="${h}" rx="10" fill="${ST_BG[st]}" stroke="${ST_COLOR[st]}" stroke-opacity=".5"/>` +
+    `<polygon points="${f1(cx - 4)},${f1(y + h - .5)} ${f1(cx + 4)},${f1(y + h - .5)} ${f1(cx)},${f1(y + h + 5)}" fill="${ST_BG[st]}"/>` +
+    `<text x="${f1(cx)}" y="${f1(y + 14)}" text-anchor="middle" fill="${ST_COLOR[st]}">${esc(label)}</text></g>`;
+}
+
+function desk(dx, dy, st, empty) {
+  const scr = SCREEN[empty ? "empty" : st] || SCREEN.idle, [mx, my] = P(dx + 1.55, dy + .45, .7);
+  return shadow(dx, dy, 2, .9) + box(dx, dy, 0, 2, .9, .7, C.deskT, C.deskL, C.deskR) +
+    box(dx + .55, dy + .12, .7, .95, .16, .55, C.mon, scr, C.monS, false) +
+    `<rect x="${f1(mx - 3)}" y="${f1(my - 6)}" width="6" height="6" rx="1.5" fill="${empty ? "#e9e4da" : "#f6f2ea"}" stroke="#d9d2c4"/>` +
+    (empty ? "" : (() => { const [px, py] = P(dx + .25, dy + .5, .7); return `<rect x="${f1(px - 3.5)}" y="${f1(py - 6)}" width="7" height="6" rx="1.5" fill="${C.potW}" stroke="#e0dbd0"/>` + leafBall(px, py - 9, 6, [C.g2, C.g1, C.g3]); })());
+}
+
+/* ----- 배치: 1열 [라운지 · 대표실 · 그린 라운지], 2열부터 본부별로 3팀씩 ----- */
+const COLW = 8, GAPX = 1.4, GAPY = 2.4, PER = 2, DROW = 2.6;
+function layout(staff) {
+  const depts = OFFICE_DATA.departments;
+  const rows = [[{ id:"lounge", kind:"lounge", name:"탕비실 · 보드게임 라운지" }, { id:"exec", kind:"exec", name:"대표실" }, { id:"garden", kind:"garden", name:"그린 라운지" }]];
+  for (const div of [...new Set(depts.map(d => d.division))]) {
+    const ds = depts.filter(d => d.division === div);
+    for (let i = 0; i < ds.length; i += 3) rows.push(ds.slice(i, i + 3).map(d => ({ ...d, kind:"dept" })));
+  }
+  for (const r of rows) for (const z of r) {
+    if (z.kind !== "dept") { z.d = 6.2; continue; }
+    z.members = staff.filter(s => s.dept === z.id);
+    z.slots = Math.max(z.minDesks || 1, z.members.length);
+    z.deskRows = Math.ceil(z.slots / PER);
+    z.d = 4.4 + (z.deskRows - 1) * DROW;
+  }
+  const W = 3 * COLW + 2 * GAPX + 2.4;
+  let y = 1.4;
+  for (const r of rows) {
+    const rd = Math.max(...r.map(z => z.d)), off = (3 - r.length) * (COLW + GAPX) / 2;
+    r.forEach((z, i) => { z.x = 1.2 + off + i * (COLW + GAPX); z.y = y; z.w = COLW; z.d = rd; });
+    y += rd + GAPY;
+  }
+  return { zones: rows.flat(), rows, W, D: y + .2 };
+}
+
+function phaseNow() {
+  if (phaseMode !== "auto") return phaseMode;
+  const h = new Date().getHours();
+  return h >= 6 && h < 17 ? "day" : h >= 17 && h < 19 ? "dusk" : "night";
+}
+
+function render() {
+  const staff = [...OFFICE_DATA.staff, ...previews];
+  const { zones, rows, W, D } = layout(staff);
+  const WALL = 2.9, phase = phaseNow();
+  const exec = zones.find(z => z.id === "exec");
+  const ceoX = P(exec.x + 4, exec.y + 1.6)[0];
+  let back = "", floor = "", objs = [], bubs = [];
+  const add = (depth, svg) => objs.push({ depth, svg });
+
+  /* 바닥 */
+  back += box(0, 0, -.4, W, D, .4, C.floor, C.base1, C.base2, false);
+  for (let j = .5; j < D; j += .5) back += `<line x1="${f1(P(0,j)[0])}" y1="${f1(P(0,j)[1])}" x2="${f1(P(W,j)[0])}" y2="${f1(P(W,j)[1])}" stroke="${C.plank}" stroke-width="1"/>`;
+  for (let j = 0; j < D; j += .5) { const off = (j * 2) % 3; for (let i = 1 + off; i < W; i += 3) back += `<line x1="${f1(P(i,j)[0])}" y1="${f1(P(i,j)[1])}" x2="${f1(P(i,j + .5)[0])}" y2="${f1(P(i,j + .5)[1])}" stroke="${C.plank}" stroke-width="1"/>`; }
+
+  /* 온실 유리벽 */
+  const [sk1, sk2] = SKY[phase];
+  back += `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sk1}"/><stop offset="1" stop-color="${sk2}"/></linearGradient>
+    <radialGradient id="poolGrad"><stop offset="0" stop-color="#ffd58a" stop-opacity=".75"/><stop offset="1" stop-color="#ffd58a" stop-opacity="0"/></radialGradient></defs>`;
+  back += poly([P(0,0,WALL),P(W,0,WALL),P(W,0,0),P(0,0,0)], C.frame) + poly([P(0,0,WALL),P(0,D,WALL),P(0,D,0),P(0,0,0)], C.frameS);
+  const nX = Math.floor((W - .6) / 2.2), pw = (W - .6) / nX, nY = Math.floor((D - .6) / 2.2), ph = (D - .6) / nY;
+  for (let i = 0; i < nX; i++) { const a = .3 + i * pw + .08, b = .3 + (i + 1) * pw - .08; back += poly([P(a,0,WALL - .15),P(b,0,WALL - .15),P(b,0,.35),P(a,0,.35)], "url(#sky)") + `<line x1="${f1(P(a,0,1.5)[0])}" y1="${f1(P(a,0,1.5)[1])}" x2="${f1(P(b,0,1.5)[0])}" y2="${f1(P(b,0,1.5)[1])}" stroke="${C.frame}" stroke-width="2"/>`; }
+  for (let i = 0; i < nY; i++) { const a = .3 + i * ph + .08, b = .3 + (i + 1) * ph - .08; back += poly([P(0,a,WALL - .15),P(0,b,WALL - .15),P(0,b,.35),P(0,a,.35)], "url(#sky)", `opacity=".9"`) + `<line x1="${f1(P(0,a,1.5)[0])}" y1="${f1(P(0,a,1.5)[1])}" x2="${f1(P(0,b,1.5)[0])}" y2="${f1(P(0,b,1.5)[1])}" stroke="${C.frameS}" stroke-width="2"/>`; }
+  if (phase === "night") for (let i = 0; i < 34; i++) { const t = (i * 37) % 100 / 100, h = (i * 53) % 60 / 100; const [sx, sy] = P(.5 + t * (W - 1), 0, WALL - .4 - h * 1.6); back += `<circle cx="${f1(sx)}" cy="${f1(sy)}" r="${i % 4 ? .9 : 1.4}" fill="#fff6d8" opacity=".85"/>`; }
+  back += poly([P(0,0,WALL),P(W,0,WALL),P(W,-.3,WALL + .12),P(-.3,-.3,WALL + .12),P(-.3,D,WALL + .12),P(0,D,WALL)], C.frameT);
+  for (let i = 0; i <= W + .01; i += pw) back += `<line x1="${f1(P(i,0,WALL)[0])}" y1="${f1(P(i,0,WALL)[1])}" x2="${f1(P(i,0,0)[0])}" y2="${f1(P(i,0,0)[1])}" stroke="${C.frame}" stroke-width="2.4"/>`;
+  /* 벽 화단 */
+  back += box(.6, .15, 0, W - 1.2, .45, .35, "#7aa57f", C.whiteL, C.whiteR);
+  for (let i = 1; i < W - 1; i += 1.0) { const [cx, cy] = P(i, .37, .35); back += leafBall(cx, cy - 2, 9, [C.g4, C.g2, C.g1, C.g3]); }
+  back += box(.15, .8, 0, .45, D - 1.5, .35, "#7aa57f", C.whiteL, C.whiteR);
+  for (let j = 1.2; j < D - .8; j += 1.0) { const [cx, cy] = P(.37, j, .35); back += leafBall(cx, cy - 2, 9, [C.g4, C.g2, C.g1, C.g3]); }
+  for (let i = 2.5; i < W - 1.5; i += 3.2) back += hangingPlant(i, .9, WALL - .5, 30 + (i * 7) % 14);
+  for (let j = 3; j < D - 2; j += 4.2) back += hangingPlant(.9, j, WALL - .5, 32);
+
+  for (const z of zones) {
+    const rug = C.rug[z.kind === "dept" ? (z.planned ? "side" : "fin") : z.kind];
+    floor += poly([P(z.x,z.y),P(z.x + z.w,z.y),P(z.x + z.w,z.y + z.d),P(z.x,z.y + z.d)], rug[0], `stroke="${rug[1]}" stroke-width="${z.planned ? 2 : 3}" ${z.planned ? 'stroke-dasharray="7 5"' : ""} stroke-linejoin="round" class="${z.kind !== "dept" ? "hit" : ""}" ${z.kind !== "dept" ? `data-id="${z.id}"` : ""}`);
+    if (!z.planned) floor += poly([P(z.x + .3,z.y + .3),P(z.x + z.w - .3,z.y + .3),P(z.x + z.w - .3,z.y + z.d - .3),P(z.x + .3,z.y + z.d - .3)], "none", `stroke="${rug[1]}" stroke-width="1" opacity=".7"`);
+    const label = z.planned ? `${z.name} · ${(z.members || []).some(m => m.active) ? "일부 가동" : "준비 중"}` : z.name;
+    { const [lx0, ly0] = P(z.x + z.w, z.y), lx = lx0 - 34, ly = ly0 + 8, lw = [...label].reduce((a, c) => a + (c.charCodeAt(0) > 255 ? 12.5 : 6.5), 0) + 18;
+      bubs.unshift(`<g class="zlabel"><rect x="${f1(lx - lw / 2)}" y="${f1(ly - 10)}" width="${f1(lw)}" height="20" rx="10" fill="#fffdf8" fill-opacity=".95" stroke="${rug[1]}" stroke-width="1.5" ${z.planned ? 'stroke-dasharray="4 3"' : ""}/><text x="${f1(lx)}" y="${f1(ly + 4)}" text-anchor="middle" font-size="12" font-weight="700" fill="#6b5c45">${esc(label)}</text></g>`); }
+    floor += lightPool(z.x + z.w / 2, z.y + z.d / 2, 3.2);
+
+    if (z.kind === "exec") {
+      const dx = z.x + (z.w - 3.2) / 2, dy = z.y + 2.0;
+      add(z.x + z.y + 1, box(z.x + .5, z.y + .35, 0, 1.8, .5, .95, C.execT, C.execL, C.execR) + (() => { const [bx, by] = P(z.x + 1.2, z.y + .6, .95); return `<rect x="${f1(bx - 10)}" y="${f1(by - 14)}" width="7" height="12" rx="1" fill="#7d9bb5"/><rect x="${f1(bx - 2)}" y="${f1(by - 16)}" width="6" height="14" rx="1" fill="#d9b56b"/><rect x="${f1(bx + 5)}" y="${f1(by - 12)}" width="6" height="10" rx="1" fill="#c07a63"/>` + leafBall(bx + 18, by - 10, 8, [C.g2, C.g1, C.g3]); })());
+      add(z.x + z.w + z.y, monstera(z.x + z.w - 1.3, z.y + .5, 1.15));
+      add(z.x + z.y + 4.5, fiddle(z.x + .5, z.y + 4.2));
+      add(z.x + z.w + z.y + 4, snake(z.x + z.w - 1.0, z.y + 4.6));
+      const ceo = { ...OFFICE_DATA.ceo, id:"ceo", status:"ceo" };
+      const [cx, cy] = P(dx + 1.6, dy - .35, .85);
+      add(dx + dy + 1.2, `<g class="hit" data-id="ceo">${chibi(ceo, cx, cy, 1.15, { rot:0, eye:0 })}</g>`);
+      add(dx + dy + 2.2, `<g class="hit" data-id="ceo">${shadow(dx, dy, 3.2, 1.2)}${box(dx, dy, 0, 3.2, 1.2, .75, C.execT, C.execL, C.execR)}` +
+        box(dx + .35, dy + .15, .75, .9, .16, .55, C.mon, "#a9d3e8", C.monS, false) + box(dx + 1.75, dy + .15, .75, .9, .16, .55, C.mon, "#a9d3e8", C.monS, false) +
+        (() => { const [px, py] = P(dx + 2.9, dy + .75, .75); return `<rect x="${f1(px - 4)}" y="${f1(py - 7)}" width="8" height="7" rx="2" fill="${C.potW}"/>` + leafBall(px, py - 11, 8, [C.g2, C.g1, C.g3]); })() + `</g>`);
+      if (selId === "ceo") floor += `<ellipse cx="${f1(P(dx + 1.6, dy + .3)[0])}" cy="${f1(P(dx + 1.6, dy + .3)[1])}" rx="78" ry="34" fill="none" stroke="#3f6b55" stroke-width="2" stroke-dasharray="5 4" opacity=".7"/>`;
+      bubs.push(bubble(cx, cy - 56 * 1.15, "ceo", "대표 (나)"));
+      continue;
+    }
+
+    if (z.kind === "lounge") {
+      /* 탕비실: 흰 수납장 + 원목 상판, 커피머신, 머그, 냉장고 */
+      const kx = z.x + .4, ky = z.y + .3;
+      add(kx + ky + 2.6, box(kx, ky, 0, 4.4, .75, .9, "#e0c49a", C.whiteL, C.whiteR) +
+        box(kx + 3.55, ky + .12, .9, .55, .45, .55, "#3a3a3a", "#2b2b2b", "#454545", false) + (() => { const [a, b] = P(kx + 3.8, ky + .57, 1.15); return `<circle cx="${f1(a)}" cy="${f1(b)}" r="1.6" fill="#e76f51"/>`; })() +
+        (() => { let m = ""; for (let i = 0; i < 4; i++) { const [mx, my] = P(kx + 1.1 + i * .45, ky + .45, .9); m += `<rect x="${f1(mx - 3)}" y="${f1(my - 6)}" width="6" height="6" rx="1.5" fill="${["#f7f4ee","#e9c46a","#8fae9a","#e07a5f"][i]}"/>`; } return m; })() +
+        (() => { const [px, py] = P(kx + .45, ky + .4, .9); return `<rect x="${f1(px - 5)}" y="${f1(py - 7)}" width="10" height="7" rx="2" fill="${C.potW}"/>` + leafBall(px, py - 12, 10, [C.g4, C.g2, C.g1]); })() +
+        (() => { const [px, py] = P(kx + 2.9, ky + .4, .9); return `<path d="M${f1(px - 4)},${f1(py)} l1,-8 h6 l1,8z" fill="#d9d4ca"/><path d="M${f1(px - 2)},${f1(py - 10)} q-3,-3 0,-6" stroke="#c0b9ab" fill="none"/>`; })());
+      add(kx + 4.6 + ky + .4, box(kx + 4.6, ky, 0, .9, .8, 1.9, "#eeeae2", "#dcd6cb", "#cdc6b9") + (() => { const [a, b] = P(kx + 5.5, ky + .2, 1.5), [c, d] = P(kx + 5.5, ky + .2, 1.0); return `<line x1="${f1(a)}" y1="${f1(b)}" x2="${f1(c)}" y2="${f1(d)}" stroke="#a9a196" stroke-width="2"/>`; })());
+      /* 보드게임 테이블 */
+      const tx = z.x + 1.9, ty = z.y + 2.9, tw = 3.6, td = 1.7, tz = .72;
+      const players = [
+        { at:[tx + .9, ty - .4], look:{ skin:4, hair:"ponytail", hairColor:"#2b2220", top:"hoodie", topColor:"#88a9c3", acc:[] }, pose:"cheer" },
+        { at:[tx + 2.7, ty - .4], look:{ skin:1, hair:"curly", hairColor:"#b5532f", top:"stripe", topColor:"#3d5a40", stripe:"#efe9dc", acc:["glasses"] }, pose:"think" }
+      ];
+      players.forEach((p, i) => { const [cx, cy] = P(p.at[0], p.at[1], .8); add(p.at[0] + p.at[1] + .5, chibi({ id:"pl" + i, look:p.look, status:"idle" }, cx, cy, .95, { rot:0, eye:0 }, { pose:p.pose, decor:true })); });
+      let t = shadow(tx, ty, tw, td) + box(tx, ty, 0, tw, td, tz, "#d9b58a", "#c49d70", "#b08a5f");
+      /* 게임판: 칸이 이어진 길과 색 타일 */
+      const bx = tx + .7, by = ty + .3, bw = 2.2, bd = 1.1;
+      t += poly([P(bx,by,tz + .01),P(bx + bw,by,tz + .01),P(bx + bw,by + bd,tz + .01),P(bx,by + bd,tz + .01)], "#f6efe0", `stroke="#cdb991" stroke-width="1"`);
+      const tile = ["#8fae9a","#e9c46a","#e07a5f","#88a9c3","#c9b79c"];
+      for (let i = 0; i < 8; i++) for (let j = 0; j < 4; j++) if ((i === 0 || i === 7 || j === 0 || j === 3) || (i === 3 && j === 2)) {
+        const a = bx + .08 + i * .26, b = by + .08 + j * .24;
+        t += poly([P(a,b,tz + .02),P(a + .22,b,tz + .02),P(a + .22,b + .2,tz + .02),P(a,b + .2,tz + .02)], tile[(i + j) % 5]);
+      }
+      const meeple = (x, y, c) => { const [mx, my] = P(x, y, tz); return `<path transform="translate(${f1(mx)},${f1(my)})" d="M-3.4,0 L-2.2,-4.2 L-4.2,-5.4 Q-4.4,-7 -2.4,-6.8 Q-2.6,-9.6 0,-9.8 Q2.6,-9.6 2.4,-6.8 Q4.4,-7 4.2,-5.4 L2.2,-4.2 L3.4,0Z" fill="${c}" stroke="${shade(c, .75)}" stroke-width=".6"/>`; };
+      t += meeple(bx + .3, by + .2, "#e07a5f") + meeple(bx + 1.9, by + .25, "#3f6b55") + meeple(bx + 1.3, by + .95, "#e9c46a") + meeple(bx + .2, by + .9, "#88a9c3");
+      const [dxp, dyp] = P(tx + .35, ty + 1.2, tz); t += `<g class="die"><rect x="${f1(dxp - 4)}" y="${f1(dyp - 8)}" width="8" height="8" rx="1.8" fill="#fffdf8" stroke="#cfc6b4"/><circle cx="${f1(dxp - 1.6)}" cy="${f1(dyp - 5.6)}" r=".9" fill="#2d2b27"/><circle cx="${f1(dxp + 1.6)}" cy="${f1(dyp - 2.4)}" r=".9" fill="#2d2b27"/><circle cx="${f1(dxp)}" cy="${f1(dyp - 4)}" r=".9" fill="#2d2b27"/></g>`;
+      const [cdx, cdy] = P(tx + 3.2, ty + .5, tz); t += [0, 1, 2].map(k => `<rect x="${f1(cdx - 5)}" y="${f1(cdy - 4 - k * 1.6)}" width="10" height="6" rx="1" fill="${k === 2 ? "#e9c46a" : "#fbf7ef"}" stroke="#d6cbb5" stroke-width=".7"/>`).join("");
+      add(tx + ty + 2.4, `<g class="hit" data-id="lounge">${t}</g>`);
+      /* 앞쪽 의자에 앉은 뒷모습 직원 (카드 들고) */
+      { const [cx, cy] = P(tx + 1.8, ty + td + .45, .8); add(tx + ty + td + 2.6, `<g class="hit" data-id="lounge">${chibi({ id:"pl3", look:{ skin:6, hair:"short", hairColor:"#1a1412", top:"tee", topColor:"#e9c46a" }, status:"idle" }, cx, cy, .95, { rot:0, eye:0 }, { back:true, decor:true, cards:true })}</g>`); }
+      add(z.x + z.w + z.y + 5, bushPot(z.x + z.w - 1, z.y + 5.0, .55, .45, "t"));
+      add(z.x + z.y + 5.4, floorLamp(z.x + .7, z.y + 5.1));
+      continue;
+    }
+
+    if (z.kind === "garden") {
+      /* 그린 라운지: 식물 사다리, 안락의자, 스탠드, 큰 화분들 */
+      add(z.x + z.y + 2, plantLadder(z.x + .5, z.y + .3));
+      add(z.x + z.y + 3, fiddle(z.x + 2.6, z.y + .5));
+      add(z.x + z.y + 5, monstera(z.x + 4.0, z.y + .8, 1.2, "g"));
+      add(z.x + z.y + 7.4, tallTree(z.x + 6.6, z.y + .6, "w"));
+      const ax = z.x + 3.0, ay = z.y + 2.8;
+      add(ax + ay + 1.4, shadow(ax, ay, 1.6, 1.3) + box(ax, ay, 0, 1.6, 1.3, .45, "#c9d6c5", "#b3c3ae", "#a3b49e") + box(ax, ay, .45, 1.6, .3, .7, "#c9d6c5", "#b3c3ae", "#a3b49e") +
+        box(ax, ay + .3, .45, .25, 1.0, .35, "#c9d6c5", "#b3c3ae", "#a3b49e") + box(ax + 1.35, ay + .3, .45, .25, 1.0, .35, "#c9d6c5", "#b3c3ae", "#a3b49e") +
+        (() => { const [px, py] = P(ax + .8, ay + .8, .5); return `<rect x="${f1(px - 7)}" y="${f1(py - 6)}" width="14" height="6" rx="2" fill="#f3ead8"/>`; })());
+      const [sx, sy] = P(ax + 2.3, ay + .9); add(ax + ay + 3.3, shadow(ax + 2, ay + .6, .6, .6) + `<rect x="${f1(sx - 1)}" y="${f1(sy - 16)}" width="2" height="16" fill="#b9976c"/><ellipse cx="${f1(sx)}" cy="${f1(sy - 16)}" rx="9" ry="4.5" fill="#e0c49a"/><rect x="${f1(sx - 4)}" y="${f1(sy - 22)}" width="8" height="5" rx="1" fill="#88a9c3"/>`);
+      add(z.x + z.y + 5.6, floorLamp(z.x + 5.6, z.y + 2.6));
+      add(z.x + z.y + 5.5, snake(z.x + .8, z.y + 4.6));
+      add(z.x + z.y + 7.2, bushPot(z.x + 2.0, z.y + 5.0, .55, .45, "g"));
+      add(z.x + z.y + 11, bushPot(z.x + 6.6, z.y + 4.6, .6, .5, "w"));
+      continue;
+    }
+
+    /* 부서: 책상을 2개씩 줄지어 배치, 인원이 늘면 줄이 늘어남 */
+    const perRow = Math.min(PER, z.slots), totalW = perRow * 2 + (perRow - 1) * 1.2, sx0 = z.x + (z.w - totalW) / 2;
+    for (let i = 0; i < z.slots; i++) {
+      const r = Math.floor(i / PER), c = i % PER;
+      const dx = sx0 + c * 3.2, dy = z.y + 1.5 + r * DROW;
+      const m = z.members[i];
+      if (!m) { add(dx + dy + 1.5, `<g opacity=".85">${desk(dx, dy, "idle", true)}</g>`); continue; }
+      const [cx, cy] = P(dx + 1.0, dy - .35, .85);
+      const dir = ceoX > cx ? 1 : -1;
+      add(dx + dy + .6, `<g class="hit" data-id="${m.id}">${chibi(m, cx, cy, 1, { rot: f1(-dir * 9), eye: f1(dir * 2.2) })}</g>`);
+      add(dx + dy + 1.5, `<g class="hit" data-id="${m.id}">${desk(dx, dy, m.status, false)}</g>`);
+      const lbl = m.status === "new" ? `${m.name} · 새 책상` : m.status === "plan" ? m.name : m.status === "idle" ? `${m.name} · 대기` : `${m.name} ${m.status === "ok" ? "✓" : m.status === "warn" ? "!" : m.status === "bad" ? "✕" : "·"} ${m.time || ""}`.trim();
+      bubs.push(bubble(cx, cy - 66, m.status, lbl));
+      if (selId === m.id) floor += `<ellipse cx="${f1(P(dx + 1, dy + .2)[0])}" cy="${f1(P(dx + 1, dy + .2)[1])}" rx="50" ry="23" fill="none" stroke="#3f6b55" stroke-width="2" stroke-dasharray="5 4" opacity=".7"/>`;
+    }
+  }
+
+  /* 복도 식물: 열과 열 사이, 줄과 줄 사이 */
+  for (const r of rows) {
+    if (r.length < 2) continue;
+    for (let i = 0; i < r.length - 1; i++) {
+      const gx = r[i].x + r[i].w + .45, gy = r[i].y;
+      add(gx + gy + 1, snake(gx, gy + .6));
+    }
+  }
+  add(1.4 + D - 1.6, monstera(.9, D - 1.6, 1.15));
+  add(W - 1.2 + D - 1.4, fiddle(W - 1.2, D - 1.4));
+
+  objs.sort((a, b) => a.depth - b.depth);
+  const xs = [P(0, D)[0] - 24, P(W, 0)[0] + 24], ysTop = P(0, 0, WALL)[1] - 50, ysBot = P(W, D)[1] + 34;
+  const tint = phase === "night" ? `<rect x="${f1(xs[0])}" y="${f1(ysTop)}" width="${f1(xs[1] - xs[0])}" height="${f1(ysBot - ysTop)}" fill="#3a4a80" opacity=".38" style="mix-blend-mode:multiply" pointer-events="none"/>`
+    : phase === "dusk" ? `<rect x="${f1(xs[0])}" y="${f1(ysTop)}" width="${f1(xs[1] - xs[0])}" height="${f1(ysBot - ysTop)}" fill="#f0a070" opacity=".18" style="mix-blend-mode:multiply" pointer-events="none"/>` : "";
+  const pools = (floor.match(/<ellipse class="pool"[^>]*\/>/g) || []).join("");
+  const glow = phase === "day" ? "" : `<g style="mix-blend-mode:screen" opacity="${phase === "night" ? .9 : .5}" pointer-events="none">${pools}</g>`;
+  const svg = $("iso");
+  svg.setAttribute("viewBox", `${f1(xs[0])} ${f1(ysTop)} ${f1(xs[1] - xs[0])} ${f1(ysBot - ysTop)}`);
+  svg.innerHTML = back + floor.replace(/<ellipse class="pool"[^>]*\/>/g, "") + objs.map(o => o.svg).join("") + tint + glow + bubs.join("");
+  svg.querySelectorAll(".hit").forEach(g => g.addEventListener("click", () => select(g.dataset.id)));
+  $("scene").dataset.phase = phase;
+  const now = new Date();
+  $("clock").textContent = `${{ day:"낮", dusk:"저녁", night:"밤" }[phase]} · ${phaseMode === "auto" ? `지금 ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}` : "미리보기"}`;
+  document.querySelectorAll("#phaseSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.p === phaseMode)));
+}
+
+function select(id) {
+  selId = id;
+  const all = [...OFFICE_DATA.staff, ...previews], active = OFFICE_DATA.staff.filter(s => ACTIVE.includes(s.status));
+  let look = false;
+  if (id === "ceo") {
+    const n = k => active.filter(s => s.status === k).length;
+    $("detail").innerHTML = `
+      <div class="detail-top"><h2>대표 (나)</h2><span class="pill idle"><span class="dot"></span>오늘의 요약</span></div>
+      <div style="font-weight:600">일하는 직원 ${active.length}명 중 완료 ${n("ok")}, 일부 막힘 ${n("warn")}, 실패 ${n("bad")}</div>
+      <dl class="kv"><dt>아침 업무</dt><dd>${OFFICE_DATA.run.mode} ${OFFICE_DATA.run.start}~${OFFICE_DATA.run.end} (${OFFICE_DATA.run.minutes}분)</dd>
+      <dt>확인할 것</dt><dd>${active.filter(s => s.status !== "ok").map(s => `${esc(s.name)}: ${esc(s.headline)}`).join("<br>") || "없음"}</dd>
+      <dt>준비 중</dt><dd>부수입 본부 ${OFFICE_DATA.staff.filter(s => s.status === "plan").length}명 (업무 분장표 작성 전)</dd></dl>
+      <ul class="items">${OFFICE_DATA.checks.map(c => `<li>${esc(c.text)}</li>`).join("")}</ul>`;
+    look = true;
+  } else if (id === "lounge") {
+    $("detail").innerHTML = `<div class="detail-top"><h2>탕비실 · 보드게임 라운지</h2><span class="pill idle"><span class="dot"></span>휴게 공간</span></div>
+      <div style="font-weight:600">커피 한 잔과 보드게임으로 쉬어 가는 곳</div>
+      <ul class="items"><li>원목 상판 수납장, 커피머신, 머그 선반, 냉장고</li><li>보드게임 테이블: 게임판, 말, 주사위, 카드</li><li>지금은 분위기를 위한 장식이에요. 나중에 "업무를 마친 직원이 라운지로 쉬러 가는" 연출도 붙일 수 있어요.</li></ul>`;
+  } else if (id === "garden") {
+    $("detail").innerHTML = `<div class="detail-top"><h2>그린 라운지</h2><span class="pill idle"><span class="dot"></span>휴게 공간</span></div>
+      <div style="font-weight:600">식물 사다리, 안락의자, 스탠드가 있는 조용한 독서 공간</div>
+      <ul class="items"><li>앞으로 부서가 늘어나면 이 자리를 회의실로 바꿀 수도 있어요.</li></ul>`;
+  } else {
+    const p = all.find(s => s.id === id); if (!p) return select("ceo");
+    const dept = OFFICE_DATA.departments.find(d => d.id === p.dept);
+    const [label, cls] = S[p.status];
+    $("detail").innerHTML = `
+      <div class="detail-top"><h2>${esc(p.name)} <span class="sub">(${esc(p.role)})</span></h2><span class="pill ${cls}"><span class="dot"></span>${label}</span></div>
+      <div style="font-weight:600">${esc(p.headline || (p.status === "idle" && p.schedule ? `오늘은 근무일이 아니에요 · 다음 근무: ${p.schedule}` : p.status === "plan" ? "부수입 본부 설계 단계에서 업무 분장표를 만들 예정이에요" : "새로 추가된 책상 (미리보기)"))}</div>
+      <dl class="kv"><dt>소속</dt><dd>${esc(dept.division)} · ${esc(dept.name)}</dd>
+      ${p.mission ? `<dt>임무</dt><dd>${esc(p.mission)}</dd>` : ""}${p.schedule ? `<dt>근무</dt><dd>${esc(p.schedule)}</dd>` : ""}
+      ${FLOW && FLOW.nodes.some(n => n.id === p.id) ? flowLinks(p.id) : ""}
+      ${p.time ? `<dt>끝난 시각</dt><dd>${OFFICE_DATA.date} ${p.time}</dd>` : ""}
+      ${p.file ? `<dt>결과 파일</dt><dd><span class="file">reports\\${OFFICE_DATA.date}\\${esc(p.file)}</span></dd>` : ""}</dl>
+      ${p.items ? `<ul class="items">${p.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : (p.active ? `<p class="sub">근무일에 일하면 결과 요약이 여기에 보여요.</p>` : `<p class="sub">업무 분장표를 만들면 이 자리에서 일을 시작해요. 이름과 모습은 임시예요.</p>`)}`;
+  }
+  render();
+  if (look) { $("iso").classList.add("look"); clearTimeout(lookTimer); lookTimer = setTimeout(() => $("iso").classList.remove("look"), 2600); }
+  try { localStorage.setItem("office-sel", id); } catch (e) {}
+}
+
+function renderStatic() {
+  const r = OFFICE_DATA.run, st = OFFICE_DATA.staff.filter(s => ACTIVE.includes(s.status));
+  $("runline").textContent = `${OFFICE_DATA.date} · ${r.mode} ${r.start}~${r.end} (${r.minutes}분)`;
+  const count = k => st.filter(s => s.status === k).length;
+  $("summary").innerHTML = ["ok","warn","bad"].map(k => `<span class="pill ${S[k][1]}"><span class="dot"></span>${S[k][0]} ${count(k)}</span>`).join("");
+  $("kpis").innerHTML = OFFICE_DATA.kpis.map(k => `<div class="kpi"><div class="l">${k.label}</div><div class="v">${k.value}</div><div class="d">${k.delta}</div></div>`).join("");
+  $("runs").innerHTML = OFFICE_DATA.runs.map(x => `<tr><td class="num">${x.at}</td><td>${x.mode}</td><td><span class="pill ok">${x.ok}</span> <span class="pill warn">${x.warn}</span> <span class="pill bad">${x.bad}</span></td><td class="num">${x.minutes}분</td></tr>`).join("");
+  $("checks").innerHTML = OFFICE_DATA.checks.map(c => `<div class="todo"><span class="pill ${S[c.status][1]}"><span class="dot"></span>${S[c.status][0]}</span><span>${esc(c.text)}</span></div>`).join("");
+  $("legend").innerHTML =
+    `<span><i style="background:${C.rug.exec[0]}"></i>대표실</span><span><i style="background:${C.rug.fin[0]}"></i>재테크 본부</span>` +
+    `<span><i style="background:${C.rug.side[0]};outline:1px dashed ${C.rug.side[1]}"></i>부수입 본부 (준비 중)</span><span><i style="background:${C.rug.lounge[0]}"></i>라운지</span>` +
+    `<span>커피 = 완료</span><span>물음표 = 일부 막힘</span><span>먹구름 = 실패</span><span>새싹 = 준비 중</span>`;
+  $("addDept").innerHTML = OFFICE_DATA.departments.map(d => `<option value="${d.id}">${esc(d.division)} · ${esc(d.name)}</option>`).join("");
+}
+
+function renderBriefTabs(cur) {
+  const tabs = PUBLIC ? [["share","공유용 브리핑"]] : [["share","공유용"],["short","출근길용"],["full","자세한 버전"]];
+  if (PUBLIC) cur = "share";
+  $("briefTabs").innerHTML = tabs.map(([k,l]) => `<button class="tab" role="tab" type="button" aria-selected="${k === cur}" data-k="${k}">${l}</button>`).join("");
+  $("briefBody").textContent = OFFICE_DATA.briefs[cur];
+  document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => { renderBriefTabs(b.dataset.k); try { localStorage.setItem("office-tab", b.dataset.k); } catch (e) {} }));
+}
+
+$("addForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("addName").value.trim(), role = $("addRole").value.trim();
+  if (!name) { $("addErr").textContent = "이름을 입력해 주세요."; $("addName").focus(); return; }
+  if (!role) { $("addErr").textContent = "직함을 입력해 주세요."; $("addRole").focus(); return; }
+  $("addErr").textContent = "";
+  const k = previews.length + Date.now() % 7;
+  const hairs = ["short","long","bun","afro","curly","braids","ponytail","buzz"], tops = ["tee","hoodie","cardigan","stripe","denim","overall"];
+  const colors = ["#7fa58a","#9b86c4","#d08a5c","#6f95c4","#c27a8a","#8aa851","#d9a441"], hc = ["#2b2220","#6b3e26","#1a1412","#b5532f","#d9b56b"];
+  const id = "preview-" + Date.now();
+  previews.push({ id, dept: $("addDept").value, name, role, status: "new",
+    look:{ skin: k % 7, hair: hairs[k % hairs.length], hairColor: hc[k % hc.length], top: tops[k % tops.length], topColor: colors[k % colors.length], inner:"#f4efe6", acc: k % 3 === 0 ? ["glasses"] : k % 3 === 1 ? ["earrings"] : [] } });
+  $("addName").value = ""; $("addRole").value = "";
+  select(id);
+});
+["addName","addRole"].forEach(i => $(i).addEventListener("input", () => { $("addErr").textContent = ""; }));
+$("resetBtn").addEventListener("click", () => { previews = []; $("addErr").textContent = ""; select(selId.startsWith("preview-") ? "ceo" : selId); });
+document.querySelectorAll("#phaseSeg button").forEach(b => b.addEventListener("click", () => { phaseMode = b.dataset.p; try { localStorage.setItem("office-phase", phaseMode); } catch (e) {} render(); }));
+$("themeBtn").addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+});
+setInterval(() => { if (phaseMode === "auto") render(); }, 60000);
+
+/* ===== 업무 흐름 보기 (n8n 같은 연결도) ===== */
+const FLOW = (window.OFFICE_STAFF || {}).flow || null;
+const FK = { trigger:["출근 신호","#e0a84a","#fbf0dc"], store:["서류함","#8a7a5c","#f3ecdf"], ext:["외부 도움","#6c8ebf","#e6eef8"], out:["알림 · 게시판","#4a6fa5","#e6eef8"], ceo:["대표 결재","#3f6b55","#e2efe6"], media:["매체","#c0504d","#f9e5e2"] };
+const DIV_COLOR = { "재테크 본부":"#5c8f73", "부수입 본부":"#c08a4a", "경영지원":"#7a6a8f" };
+const F_NW = 196, F_COLW = 258, F_ROWH = 96, F_TOP = 70, F_LEFT = 24;
+let view = "office", fz = 1, flowSel = null, fzSet = false;
+const fx = c => F_LEFT + c * F_COLW, fy = r => F_TOP + (r + .5) * F_ROWH;
+const clip = (t, px, fs) => { let w = 0, o = ""; for (const ch of String(t)) { w += ch.charCodeAt(0) > 255 ? fs : fs * .58; if (w > px) return o + "…"; o += ch; } return o; };
+function flowNodes() {
+  if (!FLOW) return [];
+  return FLOW.nodes.map(n => {
+    const p = OFFICE_DATA.staff.find(s => s.id === n.id);
+    if (p) { const d = OFFICE_DATA.departments.find(x => x.id === p.dept) || {}; return { ...n, kind:"staff", p, div:d.division, planned: p.status === "plan" }; }
+    return n;
+  });
+}
+function chain(id) {
+  const down = new Set([id]), up = new Set([id]); let grow = true;
+  /* 대표·게시처럼 여러 갈래가 모이는 칸은 그 갈래(via)가 켜졌을 때만 다음 칸으로 이어진다 */
+  while (grow) { grow = false; for (const [a, b, , , via] of FLOW.edges) {
+    if (down.has(a) && !down.has(b) && (!via || down.has(via) || up.has(via) || via === id)) { down.add(b); grow = true; }
+    if (up.has(b) && !up.has(a)) { up.add(a); grow = true; } } }
+  return new Set([...down, ...up]);
+}
+function glyph(kind, c) {
+  const g = {
+    trigger:`<path d="M2,-9 L-5,1 L0,1 L-2,9 L5,-1 L0,-1Z" fill="${c}"/>`,
+    store:`<ellipse cx="0" cy="-6" rx="7" ry="3" fill="none" stroke="${c}" stroke-width="1.8"/><path d="M-7,-6 V6 Q0,10 7,6 V-6" fill="none" stroke="${c}" stroke-width="1.8"/>`,
+    ext:`<circle r="8" fill="none" stroke="${c}" stroke-width="1.8"/><path d="M-8,0 H8 M0,-8 Q-5,0 0,8 M0,-8 Q5,0 0,8" fill="none" stroke="${c}" stroke-width="1.4"/>`,
+    out:`<rect x="-8" y="-6" width="16" height="12" rx="2" fill="none" stroke="${c}" stroke-width="1.8"/><path d="M-8,-5 L0,1 L8,-5" fill="none" stroke="${c}" stroke-width="1.6"/>`,
+    ceo:`<circle cy="-4" r="4" fill="${c}"/><path d="M-8,8 Q-8,0 0,0 Q8,0 8,8Z" fill="${c}"/>`,
+    media:`<rect x="-6" y="-8" width="12" height="16" rx="2" fill="none" stroke="${c}" stroke-width="1.8"/><path d="M-3,-3 H3 M-3,1 H3 M-3,5 H1" stroke="${c}" stroke-width="1.4"/>`
+  };
+  return g[kind] || "";
+}
+function renderFlow() {
+  if (!FLOW) { $("flow").innerHTML = `<text x="20" y="40" class="t2">dashboard-staff.js 에 flow 항목이 없어요.</text>`; return; }
+  const nodes = flowNodes(), byId = Object.fromEntries(nodes.map(n => [n.id, n]));
+  const H0 = (n) => n.kind === "staff" ? 37 : 28;
+  const tray = OFFICE_DATA.staff.filter(s => !byId[s.id] && s.status === "plan");
+  const maxRow = Math.max(...nodes.map(n => n.row), ...FLOW.lanes.map(l => l.to));
+  const W = F_LEFT * 2 + (FLOW.columns.length - 1) * F_COLW + F_NW, trayY = fy(maxRow) + 24, H = trayY + (tray.length ? 34 + Math.ceil(tray.length / 4) * 40 : 0) + 20;
+  const lit = flowSel ? chain(flowSel) : null;
+  let out = "";
+  for (const l of FLOW.lanes) {
+    const y1 = fy(l.from) - 34, y2 = fy(l.to) - 10;
+    out += `<rect class="lane" x="8" y="${y1}" width="${W - 16}" height="${y2 - y1}" rx="14"/><rect x="8" y="${y1}" width="5" height="${y2 - y1}" rx="2.5" fill="${DIV_COLOR[l.name] || "#999"}" opacity=".7"/>` +
+      `<text class="lanet" x="22" y="${y1 + 17}">${esc(l.name)}</text>`;
+  }
+  FLOW.columns.forEach((c, i) => { out += `<text class="colh" x="${fx(i) + F_NW / 2}" y="30" text-anchor="middle">${esc(c)}</text>`; });
+  out += `<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10z" fill="#a9a294"/></marker><marker id="arrHot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10z" fill="#3f6b55"/></marker></defs>`;
+  let edges = "", labels = "";
+  for (const [a, b, label, style, via] of FLOW.edges) {
+    const A = byId[a], B = byId[b]; if (!A || !B) continue;
+    let d, mx, my;
+    if (A.col === B.col) {
+      const x = fx(A.col) + F_NW / 2, up = B.row < A.row, sy = fy(A.row) + (up ? -H0(A) : H0(A)), ty = fy(B.row) + (up ? H0(B) : -H0(B));
+      d = `M${x},${sy} L${x},${ty}`; mx = x; my = (sy + ty) / 2;
+    } else {
+      const sx = fx(A.col) + F_NW, sy = fy(A.row), tx = fx(B.col), ty = fy(B.row), k = Math.max(50, (tx - sx) * .45);
+      d = `M${sx},${sy} C${sx + k},${sy} ${tx - k},${ty} ${tx},${ty}`;
+      mx = .125 * sx + .375 * (sx + k) + .375 * (tx - k) + .125 * tx; my = .5 * sy + .5 * ty;
+    }
+    const hot = lit && lit.has(a) && lit.has(b) && (!via || lit.has(via) || a === flowSel), dim = lit && !hot;
+    const cls = `edge${style === "dash" ? " dash" : ""}${hot ? " hot" : ""}${dim ? " dim" : ""}`;
+    edges += `<g class="${cls}"><path class="w" d="${d}" marker-end="url(#${hot ? "arrHot" : "arr"})"/></g>`;
+    if (label) { const w = [...label].reduce((s, c) => s + (c.charCodeAt(0) > 255 ? 10.5 : 6.2), 0) + 12;
+      labels += `<g class="${cls}"><g class="lb"><rect x="${(mx - w / 2).toFixed(1)}" y="${(my - 9).toFixed(1)}" width="${w.toFixed(1)}" height="18" rx="9"/><text x="${mx.toFixed(1)}" y="${(my + 3.6).toFixed(1)}" text-anchor="middle">${esc(label)}</text></g></g>`; }
+  }
+  let ns = "";
+  for (const n of nodes) {
+    const x = fx(n.col), y = fy(n.row), dim = lit && !lit.has(n.id) ? " dim" : "", sel = n.id === flowSel ? " sel" : "", pl = n.planned ? " planned" : "";
+    if (n.kind === "staff") {
+      const p = n.p, col = DIV_COLOR[n.div] || "#888", st = p.status, uid = "fa" + n.id.replace(/[^a-z0-9]/gi, "");
+      const stc = { ok:"#2f8f5b", warn:"#b7791f", bad:"#c0392b" }[st];
+      ns += `<g class="fnode${dim}${sel}${pl}" data-id="${n.id}" transform="translate(${x},${y})">
+        <rect class="box" x="0" y="-37" width="${F_NW}" height="74" rx="12"/><rect x="0" y="-37" width="${F_NW}" height="5" rx="2.5" fill="${col}" opacity=".85"/>
+        <clipPath id="${uid}"><circle cx="26" cy="-12" r="18"/></clipPath><circle cx="26" cy="-12" r="18" fill="${ST_BG.idle}" stroke="${col}" stroke-width="1.5"/>
+        <g clip-path="url(#${uid})">${chibi({ ...p, status:"idle" }, 26, 12, .72, { rot:0, eye:0 }, { noChair:true, decor:true })}</g>
+        <text class="t1" x="52" y="-14">${esc(clip(p.name, 120, 13.5))}</text><text class="t2" x="52" y="2">${esc(clip(p.role, 138, 11.5))}</text>
+        ${stc ? `<circle cx="${F_NW - 13}" cy="-20" r="5" fill="${stc}"><title>오늘 ${S[st][0]}</title></circle>` : ""}
+        <rect x="9" y="11" width="${F_NW - 18}" height="20" rx="10" fill="${col}" opacity=".13"/><text class="tm" x="19" y="25" fill="${col}">${esc(clip(p.mission || (n.planned ? "준비 중" : ""), F_NW - 40, 11.5))}</text>
+      </g>`;
+    } else {
+      const [kl, kc, kb] = FK[n.kind] || ["", "#888", "#eee"];
+      ns += `<g class="fnode${dim}${sel}${pl}" data-id="${n.id}" transform="translate(${x},${y})">
+        <rect class="box" x="0" y="-28" width="${F_NW}" height="56" rx="${n.kind === "trigger" ? 28 : 12}" ${n.kind === "ceo" ? `style="stroke:${kc};stroke-width:1.8"` : ""}/>
+        <circle cx="26" cy="0" r="16" fill="${kb}"/><g transform="translate(26,0)">${glyph(n.kind, kc)}</g>
+        <text class="t1" x="50" y="-4">${esc(clip(n.title, F_NW - 60, 13.5))}</text><text class="t2" x="50" y="13">${esc(clip(n.sub || "", F_NW - 58, 11.5))}</text>
+      </g>`;
+    }
+  }
+  let tr = "";
+  if (tray.length) {
+    tr += `<g class="tray${lit ? " dim" : ""}"><text class="lanet" x="22" y="${trayY + 14}">준비 중인 자리 (업무 분장표를 만들면 흐름에 들어와요)</text>`;
+    tray.forEach((p, i) => { const cx = 22 + (i % 4) * 300, cy = trayY + 26 + Math.floor(i / 4) * 40;
+      tr += `<rect class="chip" x="${cx}" y="${cy}" width="284" height="30" rx="15"/><text class="t2" x="${cx + 14}" y="${cy + 19.5}"><tspan style="font-weight:700;fill:var(--ink)">${esc(p.name)}</tspan> · ${esc(clip(p.mission || p.role, 200, 11.5))}</text>`; });
+    tr += `</g>`;
+  }
+  const svg = $("flow");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("width", Math.round(W * fz)); svg.setAttribute("height", Math.round(H * fz));
+  svg.dataset.w = W;
+  svg.innerHTML = out + edges + ns + labels + tr;
+  svg.querySelectorAll(".fnode").forEach(g => g.addEventListener("click", e => { e.stopPropagation(); flowPick(g.dataset.id); }));
+  $("flowKeys").innerHTML = Object.entries(DIV_COLOR).map(([k, c]) => `<span><i style="background:${c}"></i>${k}</span>`).join("") +
+    ["trigger","store","ext","ceo","media"].map(k => `<span><i style="background:${FK[k][2]};outline:1.5px solid ${FK[k][1]}"></i>${FK[k][0]}</span>`).join("") +
+    `<span>점선 = 읽기·참고 / 흐린 칸 = 준비 중</span>`;
+}
+function flowLinks(id) {
+  const name = x => { const n = flowNodes().find(v => v.id === x); return n ? (n.kind === "staff" ? `${n.p.name} (${n.p.role})` : n.title) : x; };
+  const ins = FLOW.edges.filter(e => e[1] === id).map(e => name(e[0]) + (e[2] ? ` · ${e[2]}` : ""));
+  const outs = FLOW.edges.filter(e => e[0] === id).map(e => name(e[1]) + (e[2] ? ` · ${e[2]}` : ""));
+  return `<dt>받는 곳</dt><dd>${ins.map(esc).join("<br>") || "없음"}</dd><dt>보내는 곳</dt><dd>${outs.map(esc).join("<br>") || "없음"}</dd>`;
+}
+function flowPick(id) {
+  flowSel = flowSel === id ? null : id;
+  if (flowSel) {
+    const n = flowNodes().find(v => v.id === id);
+    if (n && n.kind === "staff") select(id);
+    else if (n) $("detail").innerHTML = `<div class="detail-top"><h2>${esc(n.title)}</h2><span class="pill idle"><span class="dot"></span>${(FK[n.kind] || [""])[0]}</span></div>
+      <div style="font-weight:600">${esc(n.sub || "")}</div><p style="margin:8px 0 0">${esc(n.desc || "")}</p><dl class="kv">${flowLinks(id)}</dl>`;
+  }
+  renderFlow();
+}
+function fitZoom() { const box = $("flowScroll").clientWidth, W = +($("flow").dataset.w || 1900); return Math.max(.45, Math.min(1, (box - 4) / W)); }
+function setView(v) {
+  view = v === "flow" && FLOW ? "flow" : "office";
+  const f = view === "flow";
+  $("flowWrap").hidden = !f; $("scene").hidden = f; $("legend").hidden = f; $("addForm").hidden = f || PUBLIC;
+  document.querySelector(".office").classList.toggle("wide", f);
+  document.querySelectorAll("[data-office]").forEach(el => el.style.display = f ? "none" : "");
+  $("viewHint").textContent = f ? "사람이나 칸을 누르면 연결된 흐름만 진하게 보여요 · 끌어서 옮기기" : "사람·책상·라운지를 누르면 설명이 보여요 · 대표님을 누르면 직원들이 돌아봐요";
+  document.querySelectorAll("#viewSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === view)));
+  if (f) { renderFlow(); if (!fzSet) { fz = fitZoom() < .62 ? .62 : fitZoom(); fzSet = true; } renderFlow(); }
+  try { localStorage.setItem("office-view", view); } catch (e) {}
+}
+document.querySelectorAll("#viewSeg button").forEach(b => b.addEventListener("click", () => setView(b.dataset.v)));
+$("fzIn").addEventListener("click", () => { fz = Math.min(1.4, +(fz + .1).toFixed(2)); renderFlow(); });
+$("fzOut").addEventListener("click", () => { fz = Math.max(.4, +(fz - .1).toFixed(2)); renderFlow(); });
+$("fzFit").addEventListener("click", () => { fz = fitZoom(); renderFlow(); $("flowScroll").scrollTo(0, 0); });
+$("fzClear").addEventListener("click", () => { flowSel = null; renderFlow(); });
+let lastDrag = 0;
+$("flowScroll").addEventListener("click", () => { if (Date.now() - lastDrag < 300) return; if (flowSel) { flowSel = null; renderFlow(); } });
+{ const sc = $("flowScroll"); let drag = null;
+  sc.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse" || e.target.closest(".fnode")) return; drag = { x:e.clientX, y:e.clientY, l:sc.scrollLeft, t:sc.scrollTop, moved:false }; });
+  addEventListener("pointermove", e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; sc.classList.add("drag"); } sc.scrollLeft = drag.l - dx; sc.scrollTop = drag.t - dy; });
+  addEventListener("pointerup", () => { if (drag && drag.moved) lastDrag = Date.now(); drag = null; sc.classList.remove("drag"); });
+}
+
+/* ===== 대표 결재함: 관제실(control-room.ps1)이 켜져 있을 때만 버튼이 동작 ===== */
+const GROUPS = [["블로그",1,3,1],["보드라이프",4,6,2],["카페",7,9,1]];
+const ERR_KO = { "too many picks in one group":"한 갈래에서는 하나만 고를 수 있어요 (보드라이프는 두 개까지).", "file not found":"파일을 찾지 못했어요. 새로고침해 보세요.", "empty reaction":"반응을 한 줄 적어 주세요.", "not a final draft":"최종본 파일이 아니에요." };
+async function api(path, body) {
+  const r = await fetch(path, body ? { method:"POST", headers:{ "X-Office":"1", "Content-Type":"application/json" }, body:JSON.stringify(body) } : { cache:"no-store" });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(ERR_KO[j.error] || (String(j.error || "").startsWith("no matching") ? "이미 결재된 후보예요. 새로고침해 보세요." : `처리하지 못했어요 (${j.error || r.status})`));
+  return j;
+}
+function ctrlOff() {
+  $("ctrlRoom").innerHTML = `<div class="ctrl-head"><h2>대표 결재함</h2><span class="pill idle"><span class="dot"></span>관제실 꺼짐</span></div>
+    <p class="ctrl-off">주제 결재, 게시 완료, 최종본 열기 버튼은 <b>집 PC에서 관제실을 켰을 때</b> 나타나요. 사무실 폴더의 <span class="file">관제실-열기.bat</span>을 더블클릭하면 이 화면이 관제실 주소로 다시 열려요. 밖에서는 웹 대화로 "보드게임 2, 5, 8번"이라고 말해도 돼요.</p>`;
+}
+async function renderCtrl(msg) {
+  let tp, fn;
+  try { [tp, fn] = await Promise.all([api("/api/topics"), api("/api/finals")]); } catch (e) { return ctrlOff(); }
+  const items = (tp.items || []).map(t => ({ ...t, n: +t.no }));
+  const groups = GROUPS.map(([name, a, b, max]) => {
+    const list = items.filter(t => t.n >= a && t.n <= b);
+    return `<div class="grp" data-max="${max}"><div class="grp-t">${name}${max > 1 ? ` (최대 ${max}개)` : ""}</div>${list.map(t =>
+      `<label class="pick"><input type="checkbox" id="pick-${t.n}" value="${t.n}"><span>${t.n}. ${esc(t.title)}<small>${esc(t.cat)} · ${esc(t.reader)}</small></span></label>`).join("") || `<div class="sub">후보 없음</div>`}</div>`;
+  }).join("");
+  const fins = (fn.items || []);
+  $("ctrlRoom").innerHTML = `<div class="ctrl-head"><h2>대표 결재함</h2><span class="pill ok"><span class="dot"></span>관제실 켜짐 · 이 PC에서만</span></div>
+    <div class="ctrl-cols">
+      <div><h3>① 주제 결재 ${tp.date ? `<span class="sub">(${esc(tp.date)} 회의 후보)</span>` : ""}</h3>
+        ${items.length ? groups + `<div class="ctrl-act"><button class="btn main" type="button" id="pickGo" disabled>결재</button><span class="cmsg" id="pickMsg" role="status"></span></div>`
+          : `<p class="ctrl-off">결재할 주제 후보가 없어요. Mina의 다음 회의는 월·목 아침이에요.</p>`}
+      </div>
+      <div><h3>②③ 최종본 · 게시 완료 · 반응</h3>
+        ${fins.length ? fins.map((f, i) => `<div class="fin" data-i="${i}">
+          <div class="fin-top"><span class="pill idle">${esc(f.medium)}</span><b>${esc(f.folder)}</b>${f.posted ? `<span class="pill ok"><span class="dot"></span>게시함</span>` : ""}</div>
+          <div class="fin-row"><button class="btn" type="button" data-act="open">메모장으로 열기</button>${f.posted ? "" : `<button class="btn main" type="button" data-act="posted">게시함</button>`}</div>
+          <div class="fin-row"><input id="react-${i}" maxlength="120" placeholder="반응 한 줄 (예: 공감 12, 댓글 3)"><button class="btn" type="button" data-act="react">반응 저장</button></div></div>`).join("")
+          : `<p class="ctrl-off">아직 최종본이 없어요. 주제를 결재하면 다음 날 아침 초안 → 검토 → 최종본이 생겨요.</p>`}
+        <span class="cmsg" id="finMsg" role="status"></span>
+      </div>
+    </div>`;
+  if (msg) { const [id, text, err] = msg; const el = $(id); if (el) { el.textContent = text; el.classList.toggle("err", !!err); } }
+  const sync = () => {
+    document.querySelectorAll("#ctrlRoom .grp").forEach(g => {
+      const max = +g.dataset.max, boxes = [...g.querySelectorAll("input")], on = boxes.filter(b => b.checked).length;
+      boxes.forEach(b => { b.disabled = !b.checked && on >= max; b.closest(".pick").classList.toggle("off", b.disabled); });
+    });
+    const picked = [...document.querySelectorAll("#ctrlRoom .grp input:checked")].map(b => +b.value);
+    if ($("pickGo")) { $("pickGo").disabled = !picked.length; $("pickMsg").textContent = picked.length ? `고른 번호: ${picked.join(", ")}` : ""; $("pickMsg").classList.remove("err"); }
+    return picked;
+  };
+  document.querySelectorAll("#ctrlRoom .grp input").forEach(b => b.addEventListener("change", sync));
+  if ($("pickGo")) $("pickGo").addEventListener("click", async () => {
+    const picks = sync(); $("pickGo").disabled = true;
+    try { const r = await api("/api/topics/select", { date: tp.date, picks }); renderCtrl(["pickMsg", `결재했어요: ${r.selected.join(", ")}번 → 내일 아침 편집자가 초안을 써요.`]); }
+    catch (e) { $("pickMsg").textContent = e.message; $("pickMsg").classList.add("err"); $("pickGo").disabled = false; }
+  });
+  document.querySelectorAll("#ctrlRoom .fin button").forEach(b => b.addEventListener("click", async () => {
+    const i = +b.closest(".fin").dataset.i, f = fins[i], act = b.dataset.act, txt = ($("react-" + i).value || "").trim();
+    try {
+      if (act === "open") { await api("/api/open", { folder: f.folder, file: f.file }); $("finMsg").textContent = "메모장으로 열었어요."; $("finMsg").classList.remove("err"); return; }
+      if (act === "posted") { await api("/api/posted", { folder: f.folder, file: f.file, medium: f.medium, reaction: txt }); return renderCtrl(["finMsg", `게시 기록에 적었어요${txt ? " (반응도 저장)" : ""}.`]); }
+      if (act === "react") { await api("/api/reaction", { medium: f.medium, title: f.folder, text: txt }); return renderCtrl(["finMsg", "반응을 저장했어요. 일요일 주간 보고에 들어가요."]); }
+    } catch (e) { $("finMsg").textContent = e.message; $("finMsg").classList.add("err"); }
+  }));
+}
+async function initCtrl() {
+  if (PUBLIC) { $("ctrlRoom").hidden = true; return; }
+  const local = /^https?:$/.test(location.protocol) && ["localhost", "127.0.0.1"].includes(location.hostname);
+  if (!local) return ctrlOff();
+  try { await api("/api/ping"); renderCtrl(); } catch (e) { ctrlOff(); }
+}
+
+let tab = "short";
+try { selId = localStorage.getItem("office-sel") || "ceo"; tab = localStorage.getItem("office-tab") || tab; phaseMode = localStorage.getItem("office-phase") || "auto"; } catch (e) {}
+if (selId.startsWith("preview-")) selId = "ceo";
+renderStatic(); select(selId); renderBriefTabs(tab); initCtrl();
+{ let v0 = "office"; try { v0 = localStorage.getItem("office-view") || "office"; } catch (e) {} setView(v0); }
+$("dataNote").textContent = (window.OFFICE_TODAY ? `게시물 날짜 ${OFFICE_DATA.date}` : "게시물 없음") + (PUBLIC ? " · 외부용 상황판 (포트폴리오 내용은 빠져 있어요)" : "");
+if (PUBLIC) { $("addForm").hidden = true; }
+if (window.OFFICE_TODAY && OFFICE_DATA.date !== new Date().toLocaleDateString("sv-SE")) $("runline").textContent += " · 오늘 게시물이 아니에요 (아침 업무 확인 필요)";
+$("iso").classList.remove("look");
+</script>
+</body>
+</html>
