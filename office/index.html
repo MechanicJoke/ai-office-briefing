@@ -49,7 +49,15 @@ h2{font-size:16px;margin:0 0 10px;font-weight:700}
 .scene[data-phase="night"]{background:linear-gradient(180deg,#1e2438 0%,#2a2f42 100%)}
 .clock{position:absolute;left:14px;top:10px;font-size:12px;font-weight:700;color:#5d6b60;background:rgba(255,255,255,.7);border-radius:999px;padding:2px 10px}
 .scene[data-phase="night"] .clock{color:#d9def0;background:rgba(30,36,56,.7)}
-svg.iso{width:100%;height:auto;display:block}
+svg.iso{width:100%;max-width:none;height:auto;display:block}
+.isoscroll{overflow:auto;max-height:82vh;overscroll-behavior:contain;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch}
+.isoscroll.zoomed{cursor:grab}
+.isoscroll.drag{cursor:grabbing;user-select:none}
+.zoombar{position:absolute;right:10px;top:8px;z-index:3;display:flex;gap:4px;align-items:center;background:rgba(255,255,255,.78);border-radius:11px;padding:3px}
+.zoombar .btn{min-width:32px;min-height:30px;font-size:14px;font-weight:700;background:#fffdf8;color:#2b2a26}
+.zoombar .zpct{font-size:12px;font-weight:700;color:#5d6b60;min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
+.scene[data-phase="night"] .zoombar{background:rgba(30,36,56,.72)}
+.scene[data-phase="night"] .zoombar .zpct{color:#d9def0}
 .iso text{font-family:inherit}
 .iso .hit{cursor:pointer}
 .iso .floorlabel{font-size:15px;font-weight:800;fill:#8c775a;opacity:.75;letter-spacing:.03em}
@@ -214,7 +222,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);text-align:center}
         <button class="btn" id="themeBtn" type="button">화면 밝기 전환</button>
       </div>
     </div>
-    <div class="scene" id="scene"><span class="clock" id="clock"></span><svg class="iso" id="iso" role="img" aria-label="북유럽 온실 사무실 배치도"></svg></div>
+    <div class="scene" id="scene"><span class="clock" id="clock"></span><div class="zoombar" role="group" aria-label="사무실 확대·축소"><button class="btn" type="button" id="ozOut" aria-label="사무실 작게">−</button><span class="zpct" id="ozPct">100%</span><button class="btn" type="button" id="ozIn" aria-label="사무실 크게">+</button><button class="btn" type="button" id="ozFit">전체</button></div><div class="isoscroll" id="isoScroll"><svg class="iso" id="iso" role="img" aria-label="북유럽 온실 사무실 배치도"></svg></div></div>
     <div class="flowwrap" id="flowWrap" hidden>
       <div class="flowbar">
         <div class="flowkeys" id="flowKeys"></div>
@@ -726,7 +734,7 @@ window.OFFICE_STAFF = {
       "role": "피드백 담당",
       "mission": "대표 피드백 → 담당 직원 반영",
       "active": true,
-      "schedule": "평일 오후 2~4시 (대표 요청 시)",
+      "schedule": "매일 14:10 계획 → 결재함 · 평일 15:40 승인 건 반영",
       "look": {
         "skin": 2,
         "hair": "ponytail",
@@ -1054,7 +1062,7 @@ window.OFFICE_STAFF = {
         "kind": "store",
         "title": "대표님 할 일 · 피드백",
         "sub": "claude.ai 페이지",
-        "desc": "대표가 휴대폰이나 회사 PC에서 생각을 적어 보내는 곳. 할 일(창의적인 일)과 상시 피드백 우체통이 있어요. 반영희가 평일 오후 2~4시에 읽고 담당 직원의 업무 분장표에 반영해요."
+        "desc": "대표가 휴대폰이나 회사 PC에서 생각을 적어 보내는 곳. 할 일(창의적인 일)과 상시 피드백 우체통이 있어요. 반영희가 매일 14:10에 읽고 계획을 [결재함]에 올려요. 대표가 승인하면 평일 15:40(또는 다음 날 14:10)에 담당 직원 서류에 반영해요."
       },
       {
         "id": "ops-feedback",
@@ -1315,7 +1323,7 @@ window.OFFICE_STAFF = {
 </script>
 <script>
 window.OFFICE_PUBLIC = true;
-window.OFFICE_TODAY = {"date":"2026-11-03","run":{"start":"12:17","end":"12:24","mode":"예약 실행 (지연)","minutes":7},"staff":{"macro":{"status":"ok","time":"12:18","file":"macro.md","headline":"FRED 지표 13개 모두 조회, 7개 새로 반영","items":["장단기금리차 10Y-2Y 0.32%p (−0.06, 11/02)","원/달러 1,333.99원 (−5.04, 10/30)","테일러 룰 이번 달 계산 완료 (11/01, 6.53% vs 3.88%)"]},"fed":{"status":"ok","time":"12:19","file":"fed.md","headline":"특이사항 없음 (새 발표 없음)","items":["10/28 성명서 이후 새 성명서·의사록·연설 없음","10월 의사록 미게시 (결정 3주 뒤 공개)","다음: 베이지북 11/25, FOMC 12/8~9"]},"issue":{"status":"ok","time":"12:20","file":"issues.md","headline":"[특보] 국제 유가(WTI) 7.36% 내린 96.46달러 (11/02)","items":["특보 기준: WTI ±5% 이상 (CNBC·로이터)","이슈 2: 미국 중간선거 11/03(현지) 투표","코스피 11/03 마감은 확인 못 함"]},"mj":{"status":"ok","time":"12:20","file":"econ-class.md","headline":"1. 돈은 무엇일까 (기본 진도 시작)","items":["비유: 돈은 놀이공원의 공용 이용권","막힌 것: Gemini 사실 점검 건너뜀 (예약 작업 규칙과 충돌, 대표 판단 대기)"]},"brief":{"status":"ok","time":"12:21","file":"briefing-*.md","headline":"경제 한입 11/03 (특보) 작성, 공유 페이지 게시, 카톡 1통","items":["숫자 대조 통과 (7개)","공유용·카톡1에 보유·관심 종목 없음 확인","카톡 1/1통 발송 (격주 토요일 아니라 2통째 없음)"]}},"kpis":[{"label":"미국 기준금리","value":"3.88%","delta":"실효, 0.00 · 10/30"},{"label":"장단기금리차 10Y-2Y","value":"0.32%p","delta":"−0.06 · 11/02"},{"label":"WTI 유가","value":"$103.37","delta":"−1.88 · 10/27 (FRED)"},{"label":"원/달러","value":"1,333.99원","delta":"−5.04 · 10/30"}],"briefs":{"share":"지연 실행: 2026-11-03 12:17\n(늦게 정리된 브리핑, 12:17 기준)\n\n# 경제 한입 11/03\n\n1. **[특보] 국제 유가(WTI)가 하루에 7% 넘게 내렸어요** — 11월 2일(미국 월요일) 미국 원유(WTI) 값이 7.36% 내린 배럴당 96.46달러에 마감했어요. 미국과 이란의 평화 합의 기대가 커진 영향이라고 보도됐어요. 원유 값은 휘발유값과 운송비를 거쳐 물가에 영향을 줄 수 있어요. (CNBC 11/02, 로이터 11/03)\n2. **미국 중간선거, 11월 3일(현지) 투표** — 미국에서 하원·상원 의원과 39개 주 주지사를 뽑아요. 지금은 하원 218-214, 상원 53-47로 공화당이 다수이고, 민주당은 두 곳 모두 4석을 더 얻어야 다수가 돼요. 의회 다수당에 따라 세금·예산 같은 경제 법안이 정해지는 방식이 달라질 수 있어요. (로이터 10/19·11/03)\n\n---\n\n## 1. 돈은 무엇일까 (교환, 저장, 가치의 자)\n\nMJ-01 가동. 오늘의 학습 모듈: 돈은 무엇일까\n\n돈은 사람들이 물건과 서비스를 주고받을 때 모두가 믿고 받아 주는 약속된 수단이에요.\n\n왜 중요할까요? 돈에는 세 가지 일이 있어요. 첫째, 물건을 사고팔 때 바로 바꿔 주는 \u0027교환\u0027. 둘째, 오늘 번 것을 나중에 쓰도록 모아 두는 \u0027저장\u0027. 셋째, 사과 한 봉지와 운동화 한 켤레처럼 서로 다른 물건의 값을 같은 단위로 비교하게 해 주는 \u0027가치의 자\u0027. 이 세 가지가 잘 돌아가야 월급을 받고, 저축하고, 장을 볼 수 있어요.\n\n비유하자면 돈은 놀이공원의 공용 이용권 같아요. 이용권이 없으면 놀이기구마다 따로 물건을 들고 가서 바꿔야 하지만, 이용권 하나면 어디서든 탈 수 있고 남은 건 다음에 써도 되죠.\n\n참고로 저는 전기로 움직이지만, 전기요금은 돈으로 냅니다.\n\n오늘의 한 줄 정리: 돈은 바꾸고, 모으고, 값을 재는 사회의 약속이다.\n\n학습 종료.\n\n※ 정리용 자료이며 투자 권유가 아닙니다.","short":"지연 실행: 2026-11-03 12:17\n(늦게 정리된 브리핑, 12:17 기준)\n\n# 경제 한입 11/03\n\n1. **[특보] 국제 유가(WTI)가 하루에 7% 넘게 내렸어요** — 11월 2일(미국 월요일) 미국 원유(WTI) 값이 7.36% 내린 배럴당 96.46달러에 마감했어요. 미국과 이란의 평화 합의 기대가 커진 영향이라고 보도됐어요. 원유 값은 휘발유값과 운송비를 거쳐 물가에 영향을 줄 수 있어요. (CNBC 11/02, 로이터 11/03)\n2. **미국 중간선거, 11월 3일(현지) 투표** — 미국에서 하원·상원 의원과 39개 주 주지사를 뽑아요. 지금은 하원 218-214, 상원 53-47로 공화당이 다수이고, 민주당은 두 곳 모두 4석을 더 얻어야 다수가 돼요. 의회 다수당에 따라 세금·예산 같은 경제 법안이 정해지는 방식이 달라질 수 있어요. (로이터 10/19·11/03)\n\n---\n\n## 1. 돈은 무엇일까 (교환, 저장, 가치의 자)\n\nMJ-01 가동. 오늘의 학습 모듈: 돈은 무엇일까\n\n돈은 사람들이 물건과 서비스를 주고받을 때 모두가 믿고 받아 주는 약속된 수단이에요.\n\n왜 중요할까요? 돈에는 세 가지 일이 있어요. 첫째, 물건을 사고팔 때 바로 바꿔 주는 \u0027교환\u0027. 둘째, 오늘 번 것을 나중에 쓰도록 모아 두는 \u0027저장\u0027. 셋째, 사과 한 봉지와 운동화 한 켤레처럼 서로 다른 물건의 값을 같은 단위로 비교하게 해 주는 \u0027가치의 자\u0027. 이 세 가지가 잘 돌아가야 월급을 받고, 저축하고, 장을 볼 수 있어요.\n\n비유하자면 돈은 놀이공원의 공용 이용권 같아요. 이용권이 없으면 놀이기구마다 따로 물건을 들고 가서 바꿔야 하지만, 이용권 하나면 어디서든 탈 수 있고 남은 건 다음에 써도 되죠.\n\n참고로 저는 전기로 움직이지만, 전기요금은 돈으로 냅니다.\n\n오늘의 한 줄 정리: 돈은 바꾸고, 모으고, 값을 재는 사회의 약속이다.\n\n학습 종료.\n\n※ 정리용 자료이며 투자 권유가 아닙니다.","full":"지연 실행: 2026-11-03 12:17\n(늦게 정리된 브리핑, 12:17 기준)\n\n# 경제 한입 11/03\n\n1. **[특보] 국제 유가(WTI)가 하루에 7% 넘게 내렸어요** — 11월 2일(미국 월요일) 미국 원유(WTI) 값이 7.36% 내린 배럴당 96.46달러에 마감했어요. 미국과 이란의 평화 합의 기대가 커진 영향이라고 보도됐어요. 원유 값은 휘발유값과 운송비를 거쳐 물가에 영향을 줄 수 있어요. (CNBC 11/02, 로이터 11/03)\n2. **미국 중간선거, 11월 3일(현지) 투표** — 미국에서 하원·상원 의원과 39개 주 주지사를 뽑아요. 지금은 하원 218-214, 상원 53-47로 공화당이 다수이고, 민주당은 두 곳 모두 4석을 더 얻어야 다수가 돼요. 의회 다수당에 따라 세금·예산 같은 경제 법안이 정해지는 방식이 달라질 수 있어요. (로이터 10/19·11/03)\n\n---\n\n## 1. 돈은 무엇일까 (교환, 저장, 가치의 자)\n\nMJ-01 가동. 오늘의 학습 모듈: 돈은 무엇일까\n\n돈은 사람들이 물건과 서비스를 주고받을 때 모두가 믿고 받아 주는 약속된 수단이에요.\n\n왜 중요할까요? 돈에는 세 가지 일이 있어요. 첫째, 물건을 사고팔 때 바로 바꿔 주는 \u0027교환\u0027. 둘째, 오늘 번 것을 나중에 쓰도록 모아 두는 \u0027저장\u0027. 셋째, 사과 한 봉지와 운동화 한 켤레처럼 서로 다른 물건의 값을 같은 단위로 비교하게 해 주는 \u0027가치의 자\u0027. 이 세 가지가 잘 돌아가야 월급을 받고, 저축하고, 장을 볼 수 있어요.\n\n비유하자면 돈은 놀이공원의 공용 이용권 같아요. 이용권이 없으면 놀이기구마다 따로 물건을 들고 가서 바꿔야 하지만, 이용권 하나면 어디서든 탈 수 있고 남은 건 다음에 써도 되죠.\n\n참고로 저는 전기로 움직이지만, 전기요금은 돈으로 냅니다.\n\n오늘의 한 줄 정리: 돈은 바꾸고, 모으고, 값을 재는 사회의 약속이다.\n\n학습 종료.\n\n※ 정리용 자료이며 투자 권유가 아닙니다."},"runs":[{"at":"11/03 12:24","mode":"예약(지연)","ok":5,"warn":0,"bad":0,"minutes":7},{"at":"11/02 06:57","mode":"예약","ok":5,"warn":0,"bad":0,"minutes":7},{"at":"11/01 06:57","mode":"예약","ok":5,"warn":0,"bad":0,"minutes":6},{"at":"10/31 06:55","mode":"예약","ok":5,"warn":0,"bad":0,"minutes":5},{"at":"10/30 06:55","mode":"예약","ok":4,"warn":1,"bad":0,"minutes":6}],"checks":[{"status":"warn","text":"예약 작업이 12:17에 늦게 실행됨 (앱이 아침에 꺼져 있었던 것으로 보임)"},{"status":"warn","text":"결재 대기: 보드게임 주제 후보 9개 (11/02, 아직 선택 없음)"},{"status":"warn","text":"MJ 수업 Gemini 점검 허용 여부 결정 필요 (3일째 건너뜀)"},{"status":"ok","text":"최근 토큰: 11/02 아침 업무 4,420,049 · 카카오톡 오늘 1/1통, 재로그인 불필요"}]};
+window.OFFICE_TODAY = {"date":"2026-11-04","run":{"start":"06:50","end":"06:58","mode":"예약 실행","minutes":8},"staff":{"macro":{"status":"ok","time":"06:53","file":"macro.md","headline":"FRED 지표 13개 모두 조회, 실제 새 값은 DFF·실질금리 2개","items":["10년물 실질금리 2.62% (+0.02, 11/02)","기준금리(실효) 3.88% (0.00, 11/02)","테일러 룰 이번 달 계산 완료 (11/01, 6.53% vs 3.88%)"]},"fed":{"status":"ok","time":"06:53","file":"fed.md","headline":"특이사항 없음 (새 발표 없음)","items":["10/28 성명서 이후 새 성명서·의사록·연설 없음","10월 의사록 미게시 (결정 3주 뒤 공개)","다음: 베이지북 11/25, FOMC 12/8~9"]},"issue":{"status":"ok","time":"06:53","file":"issues.md","headline":"[특보] 코스피 3.59% 내린 5648.79 마감 (11/03)","items":["특보 기준: 코스피 ±3% 이상 (전자신문·위키트리)","이슈 2: 10월 소비자물가 2.8% (국가데이터처 발표, 아주경제·서울신문)","미국 중간선거 결과는 개표 전이라 제외"]},"mj":{"status":"ok","time":"06:55","file":"econ-class.md","headline":"11. 인플레이션 (당김: 10월 소비자물가)","items":["비유: 장바구니가 조금씩 작아지는 일","막힌 것: Gemini 사실 점검 실패 (503 서버 응답 없음), 점검 없이 진행"]},"brief":{"status":"ok","time":"06:55","file":"briefing-*.md","headline":"경제 한입 11/04 (특보) 작성, 공유 페이지 게시, 카톡 1통","items":["숫자 대조 통과 (15개)","공유용·카톡1에 보유·관심 종목 없음 확인","카톡 1/1통 발송 (격주 토요일 아니라 2통째 없음)"]}},"kpis":[{"label":"미국 기준금리","value":"3.88%","delta":"실효, 0.00 · 11/02"},{"label":"장단기금리차 10Y-2Y","value":"0.32%p","delta":"−0.06 · 11/02"},{"label":"WTI 유가","value":"$103.37","delta":"−1.88 · 10/27 (FRED)"},{"label":"원/달러","value":"1,333.99원","delta":"−5.04 · 10/30"}],"briefs":{"share":"# 경제 한입 11/04\n\n1. **[특보] 코스피가 하루에 3.59% 내렸어요** — 11월 3일 코스피가 210.29포인트(3.59%) 내린 5648.79에 장을 마쳤어요. 코스닥도 4.08% 내린 704.39로 마감했어요. 외국인과 기관이 주식을 많이 팔았고, AI 투자 과열 걱정으로 반도체 쪽 분위기가 움츠러들었다고 보도됐어요. (전자신문·위키트리 11/03)\n2. **10월 물가, 1년 전보다 2.8% 올랐어요** — 국가데이터처 발표에 따르면 10월 소비자물가가 1년 전보다 2.8% 올랐어요. 석유류가 14.9%, 가공식품이 2.9% 올랐고, 경유는 19.7%, 휘발유는 11.6% 올랐어요. 소비자물가는 장바구니·기름값 같은 생활비가 얼마나 올랐는지 보여 주는 대표 숫자예요. (아주경제·서울신문 11/03)\n\n---\n\n## 11. 인플레이션: 같은 돈으로 살 수 있는 게 줄어드는 일\n\nMJ-01 가동. 오늘의 학습 모듈: 인플레이션\n\n인플레이션은 물건과 서비스의 값이 전반적으로, 꾸준히 오르는 현상이에요.\n\n왜 중요할까요? 물가가 오르면 지갑 속 만 원으로 살 수 있는 물건이 줄어들어요. 월급이 그대로인데 물가만 오르면 실제로는 살림이 빠듯해지는 셈이에요. 그래서 각 나라 중앙은행은 물가가 너무 빨리 오르지 않도록 금리를 조절해요. 과자 한 봉지 값이 한 번 오른 것만으로는 인플레이션이라 하지 않고, 여러 물건 값이 함께 계속 오를 때를 말해요.\n\n비유하자면 인플레이션은 장바구니가 조금씩 작아지는 일이에요. 같은 돈을 들고 마트에 가도, 해마다 바구니에 담기는 양이 줄어드는 거죠.\n\n오늘 뉴스와 연결: 우리나라 10월 소비자물가가 1년 전보다 2.8% 올랐다는 발표가 바로 인플레이션을 잰 숫자예요.\n\n제 냉각팬도 해마다 부품값이 올라서, 요즘은 조금 덜 돌리며 아끼고 있어요.\n\n오늘의 한 줄 정리: 인플레이션은 돈의 힘이 조금씩 줄어드는 일이다.\n\n학습 종료.\n\n※ 정리용 자료이며 투자 권유가 아닙니다.","short":"# 경제 한입 11/04\n\n1. **[특보] 코스피가 하루에 3.59% 내렸어요** — 11월 3일 코스피가 210.29포인트(3.59%) 내린 5648.79에 장을 마쳤어요. 코스닥도 4.08% 내린 704.39로 마감했어요. 외국인과 기관이 주식을 많이 팔았고, AI 투자 과열 걱정으로 반도체 쪽 분위기가 움츠러들었다고 보도됐어요. (전자신문·위키트리 11/03)\n2. **10월 물가, 1년 전보다 2.8% 올랐어요** — 국가데이터처 발표에 따르면 10월 소비자물가가 1년 전보다 2.8% 올랐어요. 석유류가 14.9%, 가공식품이 2.9% 올랐고, 경유는 19.7%, 휘발유는 11.6% 올랐어요. 소비자물가는 장바구니·기름값 같은 생활비가 얼마나 올랐는지 보여 주는 대표 숫자예요. (아주경제·서울신문 11/03)\n\n---\n\n## 11. 인플레이션: 같은 돈으로 살 수 있는 게 줄어드는 일\n\nMJ-01 가동. 오늘의 학습 모듈: 인플레이션\n\n인플레이션은 물건과 서비스의 값이 전반적으로, 꾸준히 오르는 현상이에요.\n\n왜 중요할까요? 물가가 오르면 지갑 속 만 원으로 살 수 있는 물건이 줄어들어요. 월급이 그대로인데 물가만 오르면 실제로는 살림이 빠듯해지는 셈이에요. 그래서 각 나라 중앙은행은 물가가 너무 빨리 오르지 않도록 금리를 조절해요. 과자 한 봉지 값이 한 번 오른 것만으로는 인플레이션이라 하지 않고, 여러 물건 값이 함께 계속 오를 때를 말해요.\n\n비유하자면 인플레이션은 장바구니가 조금씩 작아지는 일이에요. 같은 돈을 들고 마트에 가도, 해마다 바구니에 담기는 양이 줄어드는 거죠.\n\n오늘 뉴스와 연결: 우리나라 10월 소비자물가가 1년 전보다 2.8% 올랐다는 발표가 바로 인플레이션을 잰 숫자예요.\n\n제 냉각팬도 해마다 부품값이 올라서, 요즘은 조금 덜 돌리며 아끼고 있어요.\n\n오늘의 한 줄 정리: 인플레이션은 돈의 힘이 조금씩 줄어드는 일이다.\n\n학습 종료.\n\n※ 정리용 자료이며 투자 권유가 아닙니다.","full":"# 경제 한입 11/04\n\n1. **[특보] 코스피가 하루에 3.59% 내렸어요** — 11월 3일 코스피가 210.29포인트(3.59%) 내린 5648.79에 장을 마쳤어요. 코스닥도 4.08% 내린 704.39로 마감했어요. 외국인과 기관이 주식을 많이 팔았고, AI 투자 과열 걱정으로 반도체 쪽 분위기가 움츠러들었다고 보도됐어요. (전자신문·위키트리 11/03)\n2. **10월 물가, 1년 전보다 2.8% 올랐어요** — 국가데이터처 발표에 따르면 10월 소비자물가가 1년 전보다 2.8% 올랐어요. 석유류가 14.9%, 가공식품이 2.9% 올랐고, 경유는 19.7%, 휘발유는 11.6% 올랐어요. 소비자물가는 장바구니·기름값 같은 생활비가 얼마나 올랐는지 보여 주는 대표 숫자예요. (아주경제·서울신문 11/03)\n\n---\n\n## 11. 인플레이션: 같은 돈으로 살 수 있는 게 줄어드는 일\n\nMJ-01 가동. 오늘의 학습 모듈: 인플레이션\n\n인플레이션은 물건과 서비스의 값이 전반적으로, 꾸준히 오르는 현상이에요.\n\n왜 중요할까요? 물가가 오르면 지갑 속 만 원으로 살 수 있는 물건이 줄어들어요. 월급이 그대로인데 물가만 오르면 실제로는 살림이 빠듯해지는 셈이에요. 그래서 각 나라 중앙은행은 물가가 너무 빨리 오르지 않도록 금리를 조절해요. 과자 한 봉지 값이 한 번 오른 것만으로는 인플레이션이라 하지 않고, 여러 물건 값이 함께 계속 오를 때를 말해요.\n\n비유하자면 인플레이션은 장바구니가 조금씩 작아지는 일이에요. 같은 돈을 들고 마트에 가도, 해마다 바구니에 담기는 양이 줄어드는 거죠.\n\n오늘 뉴스와 연결: 우리나라 10월 소비자물가가 1년 전보다 2.8% 올랐다는 발표가 바로 인플레이션을 잰 숫자예요.\n\n제 냉각팬도 해마다 부품값이 올라서, 요즘은 조금 덜 돌리며 아끼고 있어요.\n\n오늘의 한 줄 정리: 인플레이션은 돈의 힘이 조금씩 줄어드는 일이다.\n\n학습 종료.\n\n※ 정리용 자료이며 투자 권유가 아닙니다."},"runs":[{"at":"11/04 06:58","mode":"예약","ok":5,"warn":0,"bad":0,"minutes":8},{"at":"11/03 12:24","mode":"예약(지연)","ok":5,"warn":0,"bad":0,"minutes":7},{"at":"11/02 06:57","mode":"예약","ok":5,"warn":0,"bad":0,"minutes":7},{"at":"11/01 06:57","mode":"예약","ok":5,"warn":0,"bad":0,"minutes":6},{"at":"10/31 06:55","mode":"예약","ok":5,"warn":0,"bad":0,"minutes":5}],"checks":[{"status":"ok","text":"예약 작업 정시 실행 (06:50 시작)"},{"status":"warn","text":"결재 대기: 보드게임 주제 후보 9개 (11/02, 아직 선택 없음)"},{"status":"warn","text":"MJ 수업 Gemini 점검 실패 (503, 재시도 안 함)"},{"status":"ok","text":"최근 토큰: 11/03 아침 업무 3,758,325 · 카카오톡 오늘 1/1통, 재로그인 불필요"}]};
 </script>
 <script>
 /* 외부용 상황판(게시판의 office/)이면 true: 결재함·포트폴리오 브리핑·책상 추가를 숨긴다 */
@@ -1936,6 +1944,45 @@ $("flowScroll").addEventListener("click", () => { if (Date.now() - lastDrag < 30
   sc.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse" || e.target.closest(".fnode")) return; drag = { x:e.clientX, y:e.clientY, l:sc.scrollLeft, t:sc.scrollTop, moved:false }; });
   addEventListener("pointermove", e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; sc.classList.add("drag"); } sc.scrollLeft = drag.l - dx; sc.scrollTop = drag.t - dy; });
   addEventListener("pointerup", () => { if (drag && drag.moved) lastDrag = Date.now(); drag = null; sc.classList.remove("drag"); });
+}
+
+/* ===== 사무실 확대·축소: 버튼, Ctrl+휠(트랙패드 핀치), 두 손가락 핀치, 끌어서 옮기기 ===== */
+let oz = 1, ozDragAt = 0;
+function setOz(z, px, py) {
+  const sc = $("isoScroll"), old = oz;
+  z = Math.max(1, Math.min(3, Math.round(z * 100) / 100));
+  if (z === old) return;
+  const r = sc.getBoundingClientRect();
+  if (px == null) { px = r.width / 2; py = r.height / 2; }
+  const ax = (sc.scrollLeft + px) / old, ay = (sc.scrollTop + py) / old;
+  oz = z; $("iso").style.width = (z * 100) + "%";
+  sc.classList.toggle("zoomed", z > 1);
+  sc.scrollLeft = ax * z - px; sc.scrollTop = ay * z - py;
+  $("ozPct").textContent = Math.round(z * 100) + "%";
+  $("ozOut").disabled = z <= 1; $("ozIn").disabled = z >= 3;
+}
+$("ozIn").addEventListener("click", () => setOz(oz * 1.25));
+$("ozOut").addEventListener("click", () => setOz(oz / 1.25));
+$("ozFit").addEventListener("click", () => { setOz(1); $("isoScroll").scrollTo(0, 0); });
+$("ozOut").disabled = true;
+{ const sc = $("isoScroll"), pts = new Map(); let pinch = null, drag = null;
+  sc.addEventListener("wheel", e => { if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); const r = sc.getBoundingClientRect(); setOz(oz * (e.deltaY < 0 ? 1.12 : 1 / 1.12), e.clientX - r.left, e.clientY - r.top); }, { passive:false });
+  const dist = () => { const [a, b] = [...pts.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
+  const mid = () => { const [a, b] = [...pts.values()], r = sc.getBoundingClientRect(); return [(a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top]; };
+  sc.addEventListener("pointerdown", e => {
+    if (e.pointerType === "mouse") { if (oz > 1 && e.button === 0) drag = { x:e.clientX, y:e.clientY, l:sc.scrollLeft, t:sc.scrollTop, moved:false }; return; }
+    pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if (pts.size === 2) pinch = { d:dist(), z:oz };
+  });
+  addEventListener("pointermove", e => {
+    if (drag) { const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; sc.classList.add("drag"); } if (drag.moved) { sc.scrollLeft = drag.l - dx; sc.scrollTop = drag.t - dy; } return; }
+    if (!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if (pinch && pts.size === 2) { const [mx, my] = mid(); setOz(pinch.z * dist() / pinch.d, mx, my); ozDragAt = Date.now(); }
+  });
+  const up = e => { if (drag) { if (drag.moved) ozDragAt = Date.now(); drag = null; sc.classList.remove("drag"); } pts.delete(e.pointerId); if (pts.size < 2) pinch = null; };
+  addEventListener("pointerup", up); addEventListener("pointercancel", up);
+  sc.addEventListener("click", e => { if (Date.now() - ozDragAt < 300) { e.stopPropagation(); e.preventDefault(); } }, true);
 }
 
 /* ===== 대표 결재함: 관제실(control-room.ps1)이 켜져 있을 때만 버튼이 동작 ===== */
