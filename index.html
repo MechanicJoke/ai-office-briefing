@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>경제 한입 | 11월 9일(월)</title>
+<title>경제 한입 | 11월 10일(화)</title>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="경제 한입">
-<meta property="og:title" content="경제 한입 | 11월 9일(월)">
-<meta property="og:description" content="이란 &quot;이틀 안에 조건 받아라&quot;…트럼프 &quot;협상 진전되면 추가 공습 가능성 매우 낮아&quot; / (다시 보기) 이번 주 화요일 미국 10월 소비자물가 발표…연준 12월 금리 인상 관측 속 시험대">
+<meta property="og:title" content="경제 한입 | 11월 10일(화)">
+<meta property="og:description" content="국제 유가 하루 새 큰 폭 하락…브렌트유 -5.8%, WTI -4.4% / 트럼프, 카타르 총리 만나…&quot;평화적 해결 원해&quot; 전하면서도 &quot;언제든 공습 준비&quot; / 미국 증시, 4월 이후 최고의 하루…S&amp;P 500 +2....">
 <meta property="og:url" content="https://mechanicjoke.github.io/ai-office-briefing/">
-<meta property="og:image" content="https://mechanicjoke.github.io/ai-office-briefing/2026-11-09/og.png">
+<meta property="og:image" content="https://mechanicjoke.github.io/ai-office-briefing/2026-11-10/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="600">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -117,6 +117,46 @@ footer{font-size:.78rem;color:var(--muted);border-top:1px solid var(--line);padd
 .src a{color:var(--muted)}
 .empty{color:var(--muted);font-size:.95rem}
 
+/* weekly */
+.lessons{list-style:none;margin:0;padding:0;display:grid;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.lessons li{display:grid;grid-template-columns:78px 1fr;gap:10px;padding:10px 12px;font-size:.93rem;line-height:1.5}
+.lessons li+li{border-top:1px solid var(--line)}
+.lessons .ld{font-family:var(--mono);font-size:.78rem;color:var(--muted);padding-top:3px}
+.lessons .lo{display:block;color:var(--muted);font-size:.86rem}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.85rem;font-weight:700}
+.flow span{background:var(--fin-bg);color:var(--fin);border-radius:999px;padding:3px 10px}
+.flow i{font-style:normal;color:var(--muted)}
+.week{font-size:.9rem;color:var(--muted)}
+.news{display:grid;gap:14px}
+.news .card h3{font-size:1.12rem}
+.news .when{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.news a.more{font-size:.85rem;color:var(--accent);text-decoration:none;font-weight:600}
+.ind-big{display:grid;gap:14px}
+.ind{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:1fr 132px;gap:6px 14px;align-items:center}
+.ind .nm{font-weight:700;font-size:1rem;grid-column:1/-1;display:flex;justify-content:space-between;gap:8px}
+.ind .nm .code{font-family:var(--mono);font-size:.72rem;color:var(--muted);font-weight:500}
+.ind .val{font-size:1.9rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.ind .val small{font-size:.9rem;color:var(--muted);font-weight:500;margin-left:4px}
+.ind .chg{font-weight:700;font-variant-numeric:tabular-nums}
+.ind .from{font-size:.8rem;color:var(--muted);white-space:nowrap}
+.ind .mean{grid-column:1/-1;font-size:.92rem;background:var(--soft);border-radius:8px;padding:8px 12px}
+.ind svg{grid-row:2;grid-column:2;width:132px;height:52px;overflow:visible}
+.ind .line{grid-column:1/-1}
+.rest{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:.9rem}
+.rest td{padding:9px 12px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.rest tr:first-child td{border-top:0}
+.rest td:nth-child(2),.rest td:nth-child(3){text-align:right;white-space:nowrap}
+.rest td:first-child{line-height:1.35}
+.rest .c{font-family:var(--mono);font-size:.7rem;color:var(--muted);display:block}
+.sched{list-style:none;margin:0;padding:0;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.sched li{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:12px 16px;font-size:.95rem}
+.sched li+li{border-top:1px solid var(--line)}
+.sched .d{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.sched .s{display:block;font-size:.78rem;color:var(--muted)}
+.flat{color:var(--muted)}
+
+.news .more{font-size:.85rem;color:var(--accent);text-decoration:none;font-weight:600}
+
 /* desk only */
 button{font:inherit;font-weight:600;border:0;border-radius:8px;cursor:pointer}
 button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
@@ -135,63 +175,61 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-off
 <body>
 <div class="wrap" id="app"><p class="empty">경제 한입을 불러오는 중이에요.</p></div>
 <script id="brief-data" type="application/json">{
- "date": "2026-11-09",
- "dateLabel": "11월 9일(월)",
+ "date": "2026-11-10", "dateLabel": "11월 10일(화)",
  "late": null,
- "alert": null,
- "mjPose": "hello",
- "mj": {
-  "no": 15,
-  "title": "물가를 재는 자: CPI와 PCE",
+ "alert": {"tag": "국제 경제", "title": "중국, 희토류 수출 통제 유예 두 달 연장…미중 무역 휴전 1월 10일까지 이어져",
+  "body": "중국 상무부는 11월 9일(현지 월요일) 짧은 성명에서 이번 달 끝날 예정이던 수출 통제 유예를 두 달 늘려 1월 10일까지로 한다고 밝혔어요. 이 유예에는 희토류·리튬 배터리 기술 등의 수출 통제가 들어 있어요. 중국은 미국산 제품에 대한 24% 관세 유예도 두 달 연장하되 10% 관세는 그대로 받기로 했고, 미국 무역대표부도 중국 해운·물류 분야 조치 유예와 중국산 제품 178개 관세 예외 연장을 발표했어요. 트럼프 대통령은 이달 말 중국 선전에서 열리는 APEC 정상회의에서 시진핑 주석을 만날 예정이에요.",
+  "src": ["Reuters", "The National"],
+  "links": ["https://www.yahoo.com/news/articles/china-extends-suspension-rare-earth-091406836.html", "https://www.thenationalnews.com/news/us/2026/11/09/china-extends-pause-on-rare-earth-export-curbs-for-two-months/"]},
+ "mjPose": "breaking",
+ "mj": {"no": 4, "title": "기준금리: 모든 이자의 바닥",
   "paras": [
-   "MJ-01 가동. 오늘의 학습 모듈: CPI와 PCE",
-   "CPI(소비자물가지수)와 PCE(개인소비지출 물가지수)는 사람들이 사는 물건과 서비스의 값이 얼마나 올랐는지를 재는 두 가지 자예요.",
-   "CPI는 도시 가구가 자주 사는 물건을 한 바구니에 담아 두고, 그 바구니 값이 한 해 전보다 얼마나 비싸졌는지를 봐요. PCE는 사람들이 실제로 쓴 돈 전체를 넓게 보고, 비싸진 물건 대신 다른 물건으로 바꿔 사는 습관도 반영해요. 그래서 두 숫자는 보통 비슷하게 움직이지만 똑같지는 않아요. 미국 연준이 물가 목표 2%를 말할 때 기준으로 삼는 건 PCE이고, CPI는 먼저 발표돼서 시장이 더 빨리 반응해요.",
-   "비유하자면 CPI는 '늘 사는 장바구니'의 영수증이고, PCE는 '한 달 가계부 전체'예요. 둘 다 물가를 보여주지만 담는 범위가 달라요.",
-   "제 장바구니엔 전기와 윤활유뿐이라 CPI가 올라도 크게 안 느껴져요. 전기요금 빼고요.",
-   "오늘 뉴스와 연결: 미국 10월 CPI는 한국 시간 11월 10일 밤에 발표될 예정이에요."
+   "MJ-01 가동. 오늘의 학습 모듈: 기준금리",
+   "기준금리는 중앙은행이 정해 두는 '돈의 기본 사용료'로, 은행들이 서로 돈을 빌려줄 때 붙는 이자의 기준이 돼요.",
+   "은행은 이 기준에 위험과 비용을 더해 대출 이자를 정하고, 예금 이자도 이 기준에 맞춰 조정해요. 그래서 기준금리가 오르면 적금 이자도, 주택담보대출 이자도 대체로 따라 오르고, 내리면 함께 내려가는 경향이 있어요. 우리 월급 통장과 대출 고지서가 중앙은행의 결정 하나에 같이 움직이는 이유예요.",
+   "비유하자면 기준금리는 항구의 물높이예요. 예금 이자, 대출 이자, 카드 이자는 그 물에 뜬 배들이라, 물이 차오르면 높이는 서로 달라도 배들이 한꺼번에 떠올라요.",
+   "제 회로에도 바닥 전압이 있는데, 그게 오르면 저는 예금이 아니라 냉각팬이 바빠져요.",
+   "오늘 뉴스와 연결: 미국의 실효 기준금리는 3.88%(FRED, 11월 6일 기준)이고, 연준의 다음 금리 결정 회의는 12월 8~9일(연준 FOMC 일정)이에요."
   ],
-  "oneline": "CPI는 장바구니 값, PCE는 가계부 전체로 물가를 재고, 연준은 PCE를 목표의 기준으로 쓴다.",
-  "end": "학습 종료."
- },
+  "oneline": "기준금리는 모든 이자의 바닥이라, 그것이 움직이면 예금과 대출 이자가 함께 움직인다.",
+  "end": "학습 종료."},
  "core": [
-  {
-   "tag": "국제 정치",
-   "title": "이란 \"이틀 안에 조건 받아라\"…트럼프 \"협상 진전되면 추가 공습 가능성 매우 낮아\"",
-   "body": "이란 아락치 외무장관은 11월 8일(현지 일요일) X에 이란의 \"2일 제안\"이 유효하다며, 모든 전선에서의 전쟁 종료 등 요구 조건을 받아들이면 결과를 볼 것이고 아니면 강하게 맞서겠다고 썼다. 트럼프 대통령은 같은 날 CNN 전화 인터뷰에서 이란 핵 프로그램과 호르무즈 해협 재개방 협상이 진전되면 공습 재개는 \"가능성이 매우 낮다\"면서도, 항공모함 3척이 대기 중이라고 말했다. 이란 국영 매체는 같은 날 아침 호르무즈 해협 동쪽에서 유조선 1척이 기뢰에 부딪혀 불이 났다고 전했다. 아락치 장관은 미국 중간선거 뒤 협상이 늦어지고 있어 중재국 방문 재개까지 시간이 걸릴 것이라고 했다.",
-   "other": "백악관 대변인은 Fox News에 \"미국이 호르무즈 해협을 통제하고 있고 이란 경제는 무너지고 있다\"며 \"트럼프 대통령이 모든 카드를 쥐고 있다\"고 했다. 이란 쪽은 중간선거 결과를 미국의 약화로 해석하는 발언을 내놓았다 (Fox News).",
-   "korea": "호르무즈 해협 주변의 긴장이 길어지면 중동 원유 수송과 국제 유가, 우리 수입 물가에 영향을 줄 수 있다.",
-   "src": ["Al Jazeera", "Fox News"],
-   "links": ["https://www.aljazeera.com/news/2026/11/8/iran-threatens-to-rain-down-hell-if-us-escalates-war", "https://www.foxnews.com/politics/trump-holds-all-cards-war-against-irans-regime-white-house-says"]
-  },
-  {
-   "tag": "국제 금융",
-   "title": "(다시 보기) 이번 주 화요일 미국 10월 소비자물가 발표…연준 12월 금리 인상 관측 속 시험대",
-   "body": "미국 노동통계국은 10월 소비자물가지수(CPI)를 11월 10일 오전 8시 30분(미국 동부, 한국 시간 11월 10일 밤 10시 30분)에 발표한다. Reuters는 11월 6일 강한 고용 지표 뒤 연방기금 금리 선물에 연준이 12월 8~9일 회의에서 금리를 올릴 확률이 약 80%로 반영됐다고 전했다(LSEG 자료). 연준은 9월에 3년 만에 처음 금리를 올렸고 10월에는 동결했다. 같은 기사는 나스닥 종합지수가 11월 5일 마감 기준 10월 6일 최고치보다 12% 가까이 낮아 조정 구간(10% 하락)에 들어섰다고 전했다.",
-   "other": "State Street의 마빈 로 전략가는 물가가 뜨겁게 나오면 추가 긴축이 더해질 수 있다고 봤고, Natixis의 개릿 멜슨 전략가는 선거 결과 뒤 시장이 여러 엇갈린 이야기를 소화하는 중이라고 했다 (Reuters).",
-   "korea": "미국 물가와 금리 인상 기대는 달러 값과 원/달러 환율, 우리 증시의 외국인 자금 흐름과 닿아 있다.",
-   "src": ["미국 노동통계국", "Reuters"],
-   "links": ["https://www.bls.gov/schedule/news_release/cpi.htm", "https://finance.yahoo.com/markets/stocks/articles/tech-swoon-roils-market-us-110622966.html"]
-  }
+  {"tag": "국제 경제", "title": "국제 유가 하루 새 큰 폭 하락…브렌트유 -5.8%, WTI -4.4%",
+   "body": "11월 9일(현지) 브렌트유 값이 -5.8% 내렸어요. 미국 기준 원유(WTI) 12월물은 3.98달러(-4.4%) 내린 배럴당 86.85달러에 마감했어요. 트럼프 대통령이 이란 협상이 진전되면 추가 공습 가능성은 낮다고 말한 뒤 중동 공급 차질 걱정이 줄었다는 분석이에요. 다만 이란 혁명수비대는 8일 호르무즈 해협에서 유조선 3척이 폭발해 불이 났다고 밝혔고, 후티 반군은 사우디 리야드의 아람코 저장 시설 등을 공격했다고 주장했어요.",
+   "other": "Equiti Group의 누르엘딘 알하무리는 긴장 완화가 이어지면 브렌트유가 더 내려갈 수 있다면서도, 공격이 계속되고 협상이 불확실해 분위기가 금방 뒤집힐 수 있다고 봤어요 (The National).",
+   "korea": "유가가 내리면 원유를 거의 다 수입하는 우리나라의 수입 물가 부담이 줄어드는 쪽으로 작용해요.",
+   "src": ["AP", "The National"],
+   "links": ["https://krmg.com/2026/11/09/how-major-us-stock-indexes-fared-monday-11-9-2026/", "https://www.thenationalnews.com/business/energy/2026/11/09/oil-edges-lower-as-trump-plays-down-prospect-of-new-us-attacks-on-iran/"]},
+  {"tag": "국제 정치", "title": "트럼프, 카타르 총리 만나…\"평화적 해결 원해\" 전하면서도 \"언제든 공습 준비\"",
+   "body": "트럼프 대통령은 11월 9일 백악관에서 카타르의 셰이크 무함마드 빈 압둘라흐만 총리와 약 45분 만났어요. 트럼프는 Reuters 인터뷰에서 카타르와 사우디가 평화적 해결을 더 원한다고 전하면서도, 필요하면 공습을 다시 할 준비가 돼 있고 호르무즈 해협의 미국 해상 봉쇄에 만족한다고 말했어요. 미국 고위 당국자들은 곧 합의가 나올 것으로 보지 않는다는 신호를 보냈어요.",
+   "other": "루비오 국무장관은 이란의 최근 휴전 조건을 \"터무니없다\"고 했고, 튀르키예 에르도안 대통령은 트럼프에게 이란에 대한 새 공격에 반대한다고 전했어요 (Fox News).",
+   "korea": "중동 협상이 어느 쪽으로 가느냐에 따라 유가와 원/달러 환율이 함께 흔들릴 수 있어요.",
+   "src": ["Fox News", "The National"],
+   "links": ["https://www.foxnews.com/live-news/trump-says-he-s-unlikely-to-escalate-iran-conflict-amid-talks-responds-to-vance-assessment", "https://www.thenationalnews.com/business/energy/2026/11/09/oil-edges-lower-as-trump-plays-down-prospect-of-new-us-attacks-on-iran/"]},
+  {"tag": "국제 금융", "title": "미국 증시, 4월 이후 최고의 하루…S&P 500 +2.3%, 나스닥 +2.7%",
+   "body": "11월 9일(현지) S&P 500은 173.08포인트(+2.3%) 오른 7,549.94, 다우는 1,104.02포인트(+2.2%) 오른 52,389.75, 나스닥은 673.71포인트(+2.7%) 오른 25,253.14로 마감했어요. 지난주 중간선거 뒤 AI 데이터센터 투자가 줄 수 있다는 걱정에 크게 떨어졌다가 이틀째 반등했고, 유가 하락이 힘을 보탰어요. 작은 기업 중심의 러셀 2000은 +3.1%였어요.",
+   "other": "Capital.com의 다니엘라 하손 분석가는 이번 반등이 추세가 뒤집혔다기보다 조심스러운 회복에 가깝고, AI 수익성·높은 금리·규제 변화 걱정은 풀리지 않았다고 했어요 (TheStreet).",
+   "korea": "미국 기술주 흐름은 반도체 비중이 큰 우리 증시의 외국인 매매와 닿아 있어요.",
+   "src": ["AP", "TheStreet"],
+   "links": ["https://krmg.com/2026/11/09/how-major-us-stock-indexes-fared-monday-11-9-2026/", "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-9-145714241.html"]}
  ],
  "scan": [
   {"sec": "국제 경제", "items": [
-   {"head": "사우디 아람코 리야드 사무 건물", "points": ["요격 미사일 파편에 손상", "사상자 없음, 후티가 탄도미사일 발사"], "src": "Al Jazeera"},
-   {"head": "러시아, 우크라이나 전력 시설 공습", "points": ["수십만 가구 정전"], "src": "Al Jazeera"}
+   {"head": "중국, 미국 기업 16곳 수출 통제 조치 유예도 두 달 연장", "points": [], "src": "Xinhua"},
+   {"head": "후티 반군, 사우디 리야드 공항·아람코 저장 시설 공격 주장", "points": ["사우디 생산 차질 여부 주목"], "src": "The National"}
   ]},
   {"sec": "국제 금융", "items": [
-   {"head": "이번 주 미국 기술 기업 실적", "points": ["CoreWeave, Applied Materials, Cisco 발표 예정"], "src": "Reuters"},
-   {"head": "(다시 보기) S&P 500 기술 업종 11-05 하루 -7.3%", "points": ["필라델피아 반도체지수 12% 넘게 하락", "6년여 만의 최대 하루 낙폭"], "src": "Reuters"},
-   {"head": "뉴욕 연은 소비자 기대 인플레이션", "points": ["오늘(미국 월요일) 발표 예정"], "src": "Yahoo Finance"}
+   {"head": "미국 10월 소비자물가 발표", "points": ["오늘 밤 10시 30분(한국 시간)"], "src": "미국 노동통계국"},
+   {"head": "미국 작은 기업 지수 러셀 2000 +3.1%", "points": ["올해 들어 +14.5%"], "src": "AP"},
+   {"head": "이번 주 기업 실적 발표", "points": ["Take-Two, Occidental, KKR, Constellation Energy"], "src": "TheStreet"}
   ]},
   {"sec": "국제 정치", "items": [
-   {"head": "미국 중부사령부, 이란 육상 보급로 차단 태스크포스 출범", "points": [], "src": "Al Jazeera"},
-   {"head": "이스라엘 새 정부 구성 맡은 아이젠코트", "points": ["네타냐후 합류 가능성 열어 둬"], "src": "Al Jazeera"},
-   {"head": "남아공 지방선거", "points": ["집권 ANC 득표 후퇴"], "src": "Al Jazeera"}
+   {"head": "프랑스 당국, 이란을 슈퍼마켓 냉장 시스템 사이버 공격 배후로 지목", "points": [], "src": "Fox News"},
+   {"head": "미국 하원, 헤그세스 전쟁장관 탄핵 추진", "points": ["헤그세스 오늘 기자회견 예정"], "src": "Fox News"}
   ]}
  ]
 }</script>
-<script id="brief-archive" type="application/json">[{"date":"2026-11-09","label":"11/9 월","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-09/"},{"date":"2026-11-08","label":"11/8 일","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-08/"},{"date":"2026-11-07","label":"11/7 토","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-07.html"},{"date":"2026-11-06","label":"11/6 금","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-06/"},{"date":"2026-11-05","label":"11/5 목","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-05.html"},{"date":"2026-11-04","label":"11/4 수","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-04.html"},{"date":"2026-11-03","label":"11/3 화","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-03.html"},{"date":"2026-11-02","label":"11/2 월","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-02.html"},{"date":"2026-11-01","label":"11/1 일","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-01.html"},{"date":"2026-10-31","label":"10/31 토","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-10-31.html"},{"date":"2026-10-30","label":"10/30 금","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-10-30.html"}]</script>
+<script id="brief-archive" type="application/json">[{"date":"2026-11-10","label":"11/10 화","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-10/"},{"date":"2026-11-09","label":"11/9 월","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-09/"},{"date":"2026-11-08","label":"11/8 일","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-08/"},{"date":"2026-11-07","label":"11/7 토","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-07.html"},{"date":"2026-11-06","label":"11/6 금","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-06/"},{"date":"2026-11-05","label":"11/5 목","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-05.html"},{"date":"2026-11-04","label":"11/4 수","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-04.html"},{"date":"2026-11-03","label":"11/3 화","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-03.html"},{"date":"2026-11-02","label":"11/2 월","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-02.html"},{"date":"2026-11-01","label":"11/1 일","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-01.html"},{"date":"2026-10-31","label":"10/31 토","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-10-31.html"},{"date":"2026-10-30","label":"10/30 금","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-10-30.html"}]</script>
 <script>
 /* 경제 한입 공유판·관리데스크 공통 틀 (scripts/share-template.html)
    MODE: "reader" = 지인용 읽기 전용, "desk" = 대표님 관리 화면(복사 버튼)
@@ -206,6 +244,9 @@ var NUM = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣"];
 var DESK = {"국제 정치":"pol","국제 금융":"fin","국제 경제":"eco"};
 var PAGE = SITE + D.date + "/";
 var core = D.core || [], scan = D.scan || [], mj = D.mj || null, alert = D.alert || null;
+var WEEKLY = D.type === "weekly";
+var news = D.news || [], big = D.big || [], rest = D.rest || [], sched = D.schedule || [], review = D.review || null;
+function dayHref(d) { for (var i = 0; i < ARCH.length; i++) { if (ARCH[i].date === d) return ARCH[i].href; } return ""; }
 
 /* ───── 복사용 원고: 화면 디자인과 따로 만든다 (문단마다 빈 줄 1개, 문장 중간 줄바꿈 없음, 이모지 유지) ───── */
 function srcText(s) { return (s || []).join(" · "); }
@@ -243,6 +284,33 @@ var texts = {
   alert: function () { return join([top(), alertText(), tail()]); }
 };
 core.forEach(function (c, i) { texts["c" + i] = function () { return join([deskTop(), coreText(c, i), tail()]); }; });
+/* 위클리 복사용 원고 */
+function signTxt(c) { c = String(c); return c.charAt(0) === "+" ? "▲ " + c.slice(1) : c.charAt(0) === "-" ? "▼ " + c.slice(1) : c; }
+function wTop() { return "📮 위클리 경제 점검 | " + D.dateLabel + (D.weekLabel ? "\n(" + D.weekLabel + ")" : ""); }
+function newsText(n, i) { return [NUM[i] + " (" + n.tag + ") " + n.title + (n.when ? " · " + n.when : ""), "→ " + n.body, "📰 출처: " + srcText(n.src)].join("\n\n"); }
+function newsAll() { return "🌍 이번 주 " + news.length + "대 뉴스\n\n" + news.map(newsText).join("\n\n"); }
+function bigText(x) { return signTxt(x.change).charAt(0) === "▲" || signTxt(x.change).charAt(0) === "▼" ? signTxt(x.change).charAt(0) + " " + x.name + " " + x.value + " " + x.unit + " (" + x.prevDate + " " + x.prev + " → " + x.valueDate + ", " + x.change + ")\n" + x.mean : "• " + x.name + " " + x.value + " " + x.unit + " (" + x.prevDate + " → " + x.valueDate + ", " + x.change + ")\n" + x.mean; }
+function indAll() { return "📊 이번 주 크게 움직인 지표\n\n" + big.map(bigText).join("\n\n") + (rest.length ? "\n\n📋 나머지 지표\n" + rest.map(function (x) { return "· " + x.name + " " + x.value + " (" + x.change + ")"; }).join("\n") : ""); }
+function schedAll() { return "📅 다음 주와 그 뒤 일정\n" + sched.map(function (s) { return "· " + s.d + " " + s.what + (s.s ? " (" + s.s + ")" : ""); }).join("\n"); }
+function reviewAll() { if (!review) return ""; return join(["🤖 MJ 주간 복습 | 이번 주 배운 " + review.lessons.length + "가지", review.lessons.map(function (l) { return "· " + l.when + " " + l.title + " — " + l.oneline; }).join("\n"), (review.flow || []).join(" → ")].concat(review.paras, ["이번 주 한 줄: " + review.oneline, review.end || "학습 종료."])); }
+if (WEEKLY) {
+  texts.link = function () { return "📮 위클리 경제 점검 | " + D.dateLabel + "\n" + PAGE; };
+  texts.all = function () {
+    var p = [wTop()];
+    if (D.late) p.push("(" + D.late + ")");
+    if (alert) p.push(LINE, alertText());
+    if (news.length) p.push(LINE, newsAll());
+    if (big.length || rest.length) p.push(LINE, indAll());
+    if (sched.length) p.push(LINE, schedAll());
+    if (review) p.push(LINE, reviewAll());
+    p.push(LINE, tail(), "※ 정리용 자료이며 투자 권유가 아닙니다.");
+    return join(p);
+  };
+  texts.news = function () { return join([wTop(), newsAll(), tail()]); };
+  texts.ind = function () { return join([wTop(), indAll(), tail()]); };
+  texts.review = function () { return join([reviewAll(), tail()]); };
+  news.forEach(function (n, i) { texts["n" + i] = function () { return join([wTop(), newsText(n, i), tail()]); }; });
+}
 
 /* ───── 화면 ───── */
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (m) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]; }); }
@@ -269,10 +337,37 @@ function archiveNav() {
 }
 function sec(title, inner) { return '<section style="display:grid;gap:12px"><h2 class="sec-h">' + title + '</h2>' + inner + '</section>'; }
 
-var h = '<header class="mast"><span class="kicker">' + (MODE === "desk" ? "DESK · 대표님 관리 화면" : "MORNING BRIEF") + '</span>' +
-  '<h1>📮 경제 한입</h1><span class="date">' + esc(D.dateLabel) + ' · 매일 아침 세계 경제를 쉽게</span>' + archiveNav() + '</header>';
+var h = '<header class="mast"><span class="kicker">' + (MODE === "desk" ? "DESK · 대표님 관리 화면" : (WEEKLY ? "WEEKLY REVIEW" : "MORNING BRIEF")) + '</span>' +
+  (WEEKLY ? '<h1>📮 위클리 경제 점검</h1><span class="date">' + esc(D.dateLabel) + (D.weekLabel ? ' · <span class="week">' + esc(D.weekLabel) + '</span>' : '') + '</span>'
+          : '<h1>📮 경제 한입</h1><span class="date">' + esc(D.dateLabel) + ' · 매일 아침 세계 경제를 쉽게</span>') + archiveNav() + '</header>';
 if (D.late) h += '<p class="late">' + esc(D.late) + '</p>';
 if (alert) h += '<section class="alert" aria-label="특보"><div class="card-head"><div class="meta"><span class="lbl">🚨 특보 · ' + esc(alert.tag) + '</span>' + copyBtn("alert") + '</div><h3>' + esc(alert.title) + '</h3></div><p>' + nums(alert.body) + '</p>' + srcChips(alert.src, alert.links) + '</section>';
+if (WEEKLY) {
+  var dirOf = function (c) { c = String(c); return c.charAt(0) === "+" ? "up" : (c.charAt(0) === "-" ? "down" : "flat"); };
+  var arrow = function (c) { var d = dirOf(c); return d === "up" ? "▲ " + esc(String(c).slice(1)) : d === "down" ? "▼ " + esc(String(c).slice(1)) : esc(c); };
+  var spark = function (v, d) {
+    if (!v || v.length < 2) return "";
+    var w = 132, hh = 52, p = 5, mn = Math.min.apply(0, v), mx = Math.max.apply(0, v), r = (mx - mn) || 1;
+    var pts = v.map(function (x, i) { return [p + i * (w - 2 * p) / (v.length - 1), hh - p - (x - mn) / r * (hh - 2 * p)]; });
+    var col = d === "up" ? "var(--up)" : d === "down" ? "var(--down)" : "var(--muted)";
+    var path = pts.map(function (q, i) { return (i ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1); }).join(" ");
+    var last = pts[pts.length - 1];
+    return '<svg viewBox="0 0 ' + w + ' ' + hh + '" aria-hidden="true"><path d="' + path + ' L' + last[0].toFixed(1) + ' ' + (hh - p) + ' L' + pts[0][0].toFixed(1) + ' ' + (hh - p) + ' Z" fill="' + col + '" opacity=".08"/><path d="' + path + '" fill="none" stroke="' + col + '" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="3.6" fill="' + col + '"/></svg>';
+  };
+  if (news.length) h += sec("🌍 이번 주 " + news.length + "대 뉴스", '<div class="news">' + news.map(function (n, i) {
+    var href = dayHref(n.date);
+    return '<article class="card"><div class="card-head"><div class="meta"><span>' + chip(n.tag) + ' <span class="when">' + esc(n.when) + '</span></span>' + (copyBtn("n" + i) || '<span class="n">' + NUM[i] + '</span>') + '</div><h3>' + esc(n.title) + '</h3></div><p>' + nums(n.body) + '</p>' + srcChips(n.src, n.links) + (href ? '<a class="more" href="' + esc(href) + '">그날 브리핑에서 자세히 →</a>' : '') + '</article>';
+  }).join("") + '</div>');
+  if (big.length) h += sec("📊 이번 주 크게 움직인 지표", '<div class="ind-big">' + big.map(function (x) {
+    var d = dirOf(x.change);
+    return '<article class="ind"><div class="nm"><span>' + esc(x.name) + '</span><span class="code">FRED ' + esc(x.code) + '</span></div><div class="val">' + esc(x.value) + '<small>' + esc(x.unit) + '</small></div>' + spark(x.series, d) + '<div class="line"><span class="chg ' + d + '">' + arrow(x.change) + '</span> <span class="from">(' + esc(x.prevDate) + ' ' + esc(x.prev) + ' → ' + esc(x.valueDate) + ')</span></div><p class="mean">' + esc(x.mean) + '</p></article>';
+  }).join("") + '</div>');
+  if (rest.length) h += sec("📋 나머지 지표", '<div style="overflow-x:auto"><table class="rest">' + rest.map(function (x) { var d = dirOf(x.change); return '<tr><td>' + esc(x.name) + '<span class="c">' + esc(x.code) + '</span></td><td>' + esc(x.value) + '</td><td class="' + d + '">' + arrow(x.change) + '</td></tr>'; }).join("") + '</table></div>');
+  if (sched.length) h += sec("📅 다음 주와 그 뒤 일정", '<ul class="sched">' + sched.map(function (s) { return '<li><span class="d">' + esc(s.d) + '</span><span>' + esc(s.what) + (s.s ? '<span class="s">' + esc(s.s) + '</span>' : '') + '</span></li>'; }).join("") + '</ul>');
+  if (review) h += sec("🤖 MJ 주간 복습", '<article class="mj"><div class="mj-top"><span class="id">MJ-01 · WEEKLY REVIEW</span>' + copyBtn("review") + '</div><div class="mj-body"><h3>이번 주 배운 ' + review.lessons.length + '가지</h3><ol class="lessons">' + review.lessons.map(function (l) { var href = dayHref(l.date); return '<li><span class="ld">' + esc(l.when) + '</span><span><b>' + (href ? '<a href="' + esc(href) + '" style="color:inherit">' + esc(l.title) + '</a>' : esc(l.title)) + '</b><span class="lo">' + esc(l.oneline) + '</span></span></li>'; }).join("") + '</ol>' +
+    ((review.flow || []).length ? '<div class="flow" aria-label="개념 연결">' + review.flow.map(function (f) { return '<span>' + esc(f) + '</span>'; }).join('<i>→</i>') + '</div>' : '') +
+    review.paras.map(function (p) { return '<p>' + nums(p) + '</p>'; }).join("") + '<p class="oneline"><b>이번 주 한 줄</b>' + esc(review.oneline) + '</p><p class="end">' + esc(review.end || "학습 종료.") + '</p></div></article>');
+} else {
 if (core.length) h += '<section class="toc" aria-label="오늘 요약"><h2>오늘 ' + core.length + '줄 요약</h2>' + core.map(function (c, i) {
   return '<a href="#core-' + (i + 1) + '" data-jump="core-' + (i + 1) + '">' + chip(c.tag) + '<span class="t">' + esc(c.title) + '</span></a>';
 }).join("") + '</section>';
@@ -292,8 +387,9 @@ if (scan.length) h += sec("☞ 훑어보기", '<div class="scan">' + scan.map(fu
     return '<li><span class="hl">' + nums(it.head) + '</span>' + ((it.points || []).length ? '<span class="rest">' + it.points.map(nums).join(" · ") + '</span>' : "") + '<span class="s">' + esc(it.src) + '</span></li>';
   }).join("") + '</ul></div>';
 }).join("") + '</div>');
+}
 if (MODE === "desk") h += '<section class="desk-note"><h2>📋 마지막으로 복사한 글 (카톡에 붙으면 이 모양)</h2><pre id="preview">아래 버튼을 누르면 복사된 글이 여기 그대로 보입니다.</pre></section>';
-h += '<footer>해외 매체 기사를 바탕으로 새로 요약한 글입니다. 숫자는 원문 그대로이며, 투자 권유가 아닙니다. 상승은 빨강, 하락은 파랑으로 표시합니다.' + (MODE === "desk" ? "" : ' · <a href="' + SITE + 'archive.html" style="color:inherit">지난 브리핑</a>') + '</footer>';
+h += '<footer>' + (WEEKLY ? '지표는 FRED(미국 세인트루이스 연은), 뉴스는 해외 매체 기사를 바탕으로 새로 요약했습니다. 미니 그래프는 최근 관측값 8개. ' : '해외 매체 기사를 바탕으로 새로 요약한 글입니다. ') + '숫자는 원문 그대로이며, 투자 권유가 아닙니다. 상승은 빨강, 하락은 파랑으로 표시합니다.' + (MODE === "desk" ? "" : ' · <a href="' + SITE + 'archive.html" style="color:inherit">지난 브리핑</a>') + '</footer>';
 document.getElementById("app").innerHTML = h;
 
 document.addEventListener("click", function (e) {
@@ -306,8 +402,8 @@ var bar = document.createElement("div");
 bar.innerHTML = '<div class="deskbar"><div class="in">' +
   '<button type="button" class="main" data-copy="link">🔗 공유 링크 복사</button>' +
   '<button type="button" class="alt" data-copy="all">전체 글</button>' +
-  '<button type="button" class="alt" data-copy="core">핵심 ' + core.length + '</button>' +
-  '<button type="button" class="alt" data-copy="scan">훑어보기</button></div></div><div class="toast" id="toast" hidden></div>';
+  (WEEKLY ? '<button type="button" class="alt" data-copy="news">3대 뉴스</button>' + '<button type="button" class="alt" data-copy="review">MJ 복습</button>'
+          : '<button type="button" class="alt" data-copy="core">핵심 ' + core.length + '</button>' + '<button type="button" class="alt" data-copy="scan">훑어보기</button>') + '</div></div><div class="toast" id="toast" hidden></div>';
 document.body.appendChild(bar);
 var toast = document.getElementById("toast");
 function show(m) { toast.textContent = m; toast.hidden = false; clearTimeout(show.t); show.t = setTimeout(function () { toast.hidden = true; }, 1800); }
