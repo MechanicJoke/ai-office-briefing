@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>경제 한입 | 11월 12일(목)</title>
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="경제 한입">
+<meta property="og:title" content="경제 한입 | 11월 12일(목)">
+<meta property="og:description" content="미국 증시, AI 종목 반등에 상승…S&amp;P 500 +1.3%, 나스닥 +1.6% / 러시아·우크라이나 아부다비 회담 마무리…대규모 포로 교환 합의, 큰 진전은 없어 / 국제 유가 다시 올라…이란 &quot;미국과 협상 없다&quot;...">
+<meta property="og:url" content="https://mechanicjoke.github.io/ai-office-briefing/2026-11-12/">
+<meta property="og:image" content="https://mechanicjoke.github.io/ai-office-briefing/2026-11-12/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="600">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Gowun+Batang:wght@700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+
+/* layout: one 640px reading column like a morning paper; summary strip first, then MJ lesson, core 3 as cards, scan list grouped by desk colour */
+:root{
+  --bg:#eef1ef; --paper:#ffffff; --ink:#18201d; --muted:#5b6762; --line:#d6ddd9; --soft:#f5f7f6;
+  --accent:#1d5c4f; --accent-ink:#ffffff;
+  --pol:#7a3b69; --pol-bg:#f6edf3; --fin:#1d5c4f; --fin-bg:#e8f2ef; --eco:#8a5a12; --eco-bg:#f8f0e2;
+  --other-bg:#f1f3f8; --other-line:#9aa6c4; --kr-bg:#fdf6e3; --kr-line:#d9b45a;
+  --up:#c8323a; --down:#2a62c9;
+  --kakao:#fee500; --kakao-ink:#191600;
+  --display:"Gowun Batang","Noto Serif KR","AppleMyungjo",serif; --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111614; --paper:#1a211e; --ink:#e8edeb; --muted:#9ca8a3; --line:#2c3632; --soft:#202925;
+  --accent:#7cc8b5; --accent-ink:#0e1412;
+  --pol:#d99bc6; --pol-bg:#2c2029; --fin:#7cc8b5; --fin-bg:#1c2b27; --eco:#e0b46a; --eco-bg:#2c2519;
+  --other-bg:#1f2330; --other-line:#6f7ca0; --kr-bg:#2a2518; --kr-line:#b8933c;
+  --up:#ff7b80; --down:#7aa7ff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111614; --paper:#1a211e; --ink:#e8edeb; --muted:#9ca8a3; --line:#2c3632; --soft:#202925;
+  --accent:#7cc8b5; --accent-ink:#0e1412;
+  --pol:#d99bc6; --pol-bg:#2c2029; --fin:#7cc8b5; --fin-bg:#1c2b27; --eco:#e0b46a; --eco-bg:#2c2519;
+  --other-bg:#1f2330; --other-line:#6f7ca0; --kr-bg:#2a2518; --kr-line:#b8933c;
+  --up:#ff7b80; --down:#7aa7ff; color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.75;word-break:keep-all;overflow-wrap:anywhere}
+.wrap{max-width:640px;margin:0 auto;padding-block:24px 96px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+p{margin:0}
+strong.num{font-variant-numeric:tabular-nums;font-weight:700}
+.up{color:var(--up)} .down{color:var(--down)}
+
+/* masthead */
+.mast{display:grid;gap:6px;border-bottom:3px double var(--line);padding-bottom:16px}
+.mast .kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;color:var(--muted)}
+.mast h1{font-family:var(--display);font-size:2.1rem;line-height:1.2;margin:0}
+.mast .date{font-size:.95rem;color:var(--muted)}
+.archive{display:flex;flex-wrap:wrap;gap:6px;font-size:.8rem}
+.archive a{color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.archive a[aria-current]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* today in 3 lines */
+.toc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;gap:10px}
+.toc h2{font-size:.78rem;letter-spacing:.1em;color:var(--muted);margin:0;font-weight:600}
+.toc a{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline;color:var(--ink);text-decoration:none;font-weight:600;line-height:1.5}
+.toc a:hover .t{text-decoration:underline}
+.chip{display:inline-block;font-size:.72rem;font-weight:700;border-radius:6px;padding:2px 7px;white-space:nowrap;letter-spacing:.02em}
+.chip.pol{background:var(--pol-bg);color:var(--pol)} .chip.fin{background:var(--fin-bg);color:var(--fin)} .chip.eco{background:var(--eco-bg);color:var(--eco)}
+
+/* section headings */
+.sec-h{display:flex;align-items:center;gap:10px;margin:0;font-size:1.05rem}
+.sec-h::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* MJ lesson */
+.mj{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.mj-top{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--soft);padding:10px 16px;border-bottom:1px solid var(--line)}
+.mj-top .id{font-family:var(--mono);font-size:.78rem;color:var(--muted);letter-spacing:.08em}
+.mj-body{padding:16px 18px 18px;display:grid;gap:14px}
+.mj-body h3{font-family:var(--display);font-size:1.35rem;line-height:1.4;margin:0;text-wrap:balance}
+.mj .oneline{background:var(--fin-bg);color:var(--ink);border-radius:8px;padding:10px 14px;font-weight:600}
+.mj .oneline b{color:var(--fin);margin-right:6px}
+.mj .end{font-family:var(--mono);font-size:.85rem;color:var(--muted);text-align:right}
+
+/* core cards */
+.cards{display:grid;gap:18px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;scroll-margin-top:16px;min-width:0}
+.card-head{display:grid;gap:8px}
+.card-head .meta{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.card-head .n{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+.card h3{font-size:1.2rem;line-height:1.45;margin:0;text-wrap:balance}
+.lead{font-size:1rem}
+.box{border-radius:8px;padding:12px 14px;display:grid;gap:4px;font-size:.95rem;border-left:4px solid}
+.box .lbl{font-size:.78rem;font-weight:700;letter-spacing:.04em}
+.box.other{background:var(--other-bg);border-color:var(--other-line)}
+.box.other .lbl{color:var(--other-line)}
+.box.kr{background:var(--kr-bg);border-color:var(--kr-line)}
+.box.kr .lbl{color:var(--kr-line)}
+.src{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.78rem;color:var(--muted)}
+.src span{border:1px solid var(--line);border-radius:999px;padding:1px 9px}
+
+/* scan */
+.scan{display:grid;gap:18px}
+.scan-group{display:grid;gap:10px}
+.scan-group ul{list-style:none;margin:0;padding:0;display:grid;gap:0;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.scan-group li{padding:12px 16px;display:grid;gap:3px;font-size:.95rem;line-height:1.6}
+.scan-group li + li{border-top:1px solid var(--line)}
+.scan-group .hl{font-weight:700}
+.scan-group .rest{color:var(--muted)}
+.scan-group .s{font-size:.75rem;color:var(--muted)}
+
+footer{font-size:.78rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+
+/* alert & notes */
+.alert{background:var(--paper);border:2px solid var(--up);border-radius:12px;padding:16px 18px;display:grid;gap:10px}
+.alert .lbl{color:var(--up);font-weight:700;font-size:.85rem;letter-spacing:.04em}
+.alert h3{margin:0;font-size:1.15rem;line-height:1.45;text-wrap:balance}
+.late{font-size:.85rem;color:var(--muted);background:var(--soft);border-radius:8px;padding:8px 12px}
+.src a{color:var(--muted)}
+.empty{color:var(--muted);font-size:.95rem}
+
+/* weekly */
+.lessons{list-style:none;margin:0;padding:0;display:grid;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.lessons li{display:grid;grid-template-columns:78px 1fr;gap:10px;padding:10px 12px;font-size:.93rem;line-height:1.5}
+.lessons li+li{border-top:1px solid var(--line)}
+.lessons .ld{font-family:var(--mono);font-size:.78rem;color:var(--muted);padding-top:3px}
+.lessons .lo{display:block;color:var(--muted);font-size:.86rem}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.85rem;font-weight:700}
+.flow span{background:var(--fin-bg);color:var(--fin);border-radius:999px;padding:3px 10px}
+.flow i{font-style:normal;color:var(--muted)}
+.week{font-size:.9rem;color:var(--muted)}
+.news{display:grid;gap:14px}
+.news .card h3{font-size:1.12rem}
+.news .when{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.news a.more{font-size:.85rem;color:var(--accent);text-decoration:none;font-weight:600}
+.ind-big{display:grid;gap:14px}
+.ind{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:1fr 132px;gap:6px 14px;align-items:center}
+.ind .nm{font-weight:700;font-size:1rem;grid-column:1/-1;display:flex;justify-content:space-between;gap:8px}
+.ind .nm .code{font-family:var(--mono);font-size:.72rem;color:var(--muted);font-weight:500}
+.ind .val{font-size:1.9rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.ind .val small{font-size:.9rem;color:var(--muted);font-weight:500;margin-left:4px}
+.ind .chg{font-weight:700;font-variant-numeric:tabular-nums}
+.ind .from{font-size:.8rem;color:var(--muted);white-space:nowrap}
+.ind .mean{grid-column:1/-1;font-size:.92rem;background:var(--soft);border-radius:8px;padding:8px 12px}
+.ind svg{grid-row:2;grid-column:2;width:132px;height:52px;overflow:visible}
+.ind .line{grid-column:1/-1}
+.rest{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:.9rem}
+.rest td{padding:9px 12px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.rest tr:first-child td{border-top:0}
+.rest td:nth-child(2),.rest td:nth-child(3){text-align:right;white-space:nowrap}
+.rest td:first-child{line-height:1.35}
+.rest .c{font-family:var(--mono);font-size:.7rem;color:var(--muted);display:block}
+.sched{list-style:none;margin:0;padding:0;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.sched li{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:12px 16px;font-size:.95rem}
+.sched li+li{border-top:1px solid var(--line)}
+.sched .d{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.sched .s{display:block;font-size:.78rem;color:var(--muted)}
+.flat{color:var(--muted)}
+
+.news .more{font-size:.85rem;color:var(--accent);text-decoration:none;font-weight:600}
+
+/* desk only */
+button{font:inherit;font-weight:600;border:0;border-radius:8px;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.copy-sm{background:var(--soft);color:var(--ink);border:1px solid var(--line);font-size:.78rem;padding:5px 10px}
+.deskbar{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));z-index:5}
+.deskbar .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:6px}
+.deskbar button{font-size:.82rem;padding:10px 6px;white-space:nowrap}
+.deskbar .main{background:var(--kakao);color:var(--kakao-ink)}
+.deskbar .alt{background:var(--soft);color:var(--ink);border:1px solid var(--line)}
+.desk-note{background:var(--soft);border:1px dashed var(--line);border-radius:12px;padding:14px;display:grid;gap:8px}
+.desk-note h2{font-size:.85rem;margin:0}
+.desk-note pre{white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;font-family:var(--sans);font-size:.85rem;margin:0;max-height:320px;overflow:auto;background:var(--paper);border-radius:8px;padding:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;font-size:.9rem;z-index:6}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><p class="empty">경제 한입을 불러오는 중이에요.</p></div>
+<script id="brief-data" type="application/json">{
+ "date": "2026-11-12", "dateLabel": "11월 12일(목)",
+ "late": null,
+ "alert": null,
+ "mjPose": "pointer",
+ "mj": {"no": 5, "title": "한국은행과 미국 연준",
+  "paras": [
+   "MJ-01 가동. 오늘의 학습 모듈: 한국은행과 미국 연준",
+   "한국은행은 우리나라의 중앙은행이고, 미국 연준(연방준비제도)은 미국의 중앙은행이에요.",
+   "두 곳 모두 하는 일의 뼈대는 같아요. 기준금리를 정해 시중에 도는 돈의 양과 물가를 조절해요. 한국은행은 물가 안정을 가장 큰 목표로 삼고 금융 안정도 함께 살펴요. 연준은 법으로 '물가 안정'과 '최대 고용', 두 가지 목표를 받았어요. 그래서 연준은 물가뿐 아니라 일자리 숫자도 늘 같이 봐요. 결정하는 곳도 달라요. 한국은행은 금융통화위원회가, 연준은 연방공개시장위원회(FOMC)가 금리를 정해요.",
+   "비유하자면 두 집의 보일러 담당자예요. 둘 다 집 안 온도(물가)를 맞추는 게 일인데, 연준 담당자는 집 안 사람들이 일하기 좋은지(고용)까지 같이 챙기라는 지시를 받은 셈이에요.",
+   "제 냉각팬도 목표가 두 개면 좋겠어요. 지금은 '돌기' 하나뿐이라서요.",
+   "오늘 뉴스와 연결: 연준의 월러 이사는 11월 10일 연설에서 물가가 목표보다 너무 높다며 12월 회의에서 0.25%p 인상을 지지하는 쪽으로 기울어 있다고 밝혔어요 (연준 공식 연설)."
+  ],
+  "oneline": "한국은행과 연준은 각 나라의 금리를 정하는 중앙은행이고, 연준은 물가와 고용 두 가지를 함께 본다.",
+  "end": "학습 종료."},
+ "core": [
+  {"tag": "국제 금융", "title": "미국 증시, AI 종목 반등에 상승…S&P 500 +1.3%, 나스닥 +1.6%",
+   "body": "11월 11일(현지) S&P 500은 98.45포인트(1.3%) 오른 7,619.38, 나스닥은 400.31포인트(1.6%) 오른 25,466.19, 다우는 254.60포인트(0.5%) 오른 52,486.49로 마감했어요 (AP). AI 데이터센터 업체 코어위브가 시장 예상보다 좋은 실적을 내 주가가 24% 뛰었고, 반도체 종목들이 상승을 이끌었어요. S&P 500은 지난달 세운 최고치와의 거리를 2.6%로 좁혔어요. 이날은 미국 재향군인의 날이라 채권시장은 쉬었어요.",
+   "other": "물가가 석 달째 예상보다 높게 나오자 월가 분석가들은 12월 금리 인상을 사실상 정해진 일로 보고, 더 많이·더 크게 올릴 가능성까지 전망을 고치고 있어요 (Yahoo Finance). 지난주 AI 둔화 걱정으로 크게 떨어진 뒤의 반등이라는 점도 함께 봐야 해요 (AP).",
+   "korea": "미국 반도체·AI 종목의 흐름은 보통 반도체 비중이 큰 우리 증시 분위기와 함께 움직이는 경우가 많아요.",
+   "src": ["AP", "Yahoo Finance"],
+   "links": ["https://krmg.com/2026/11/11/how-major-us-stock-indexes-fared-wednesday-11-11-2026/", "https://finance.yahoo.com/markets/live/stock-market-today-wednesday-november-11-dow-sp-500-nasdaq-nvidia-treasurys-veterans-day-140638547.html"]},
+  {"tag": "국제 정치", "title": "러시아·우크라이나 아부다비 회담 마무리…대규모 포로 교환 합의, 큰 진전은 없어",
+   "body": "미국 중재로 이틀 동안 열린 러시아·우크라이나 회담이 11월 11일(현지) 끝났어요. 두 나라는 대규모 전쟁포로 교환에 합의했지만 전쟁을 끝내는 큰 진전은 발표하지 않았어요 (AP). 쿠슈너 특사는 숫자는 다음 날 확정한다고 했고, 러시아 대표 메딘스키는 합의가 '원칙적' 수준이라고 했어요. 쿠슈너와 위트코프 특사는 12일(목) 모스크바에서 푸틴 대통령을, 이어 더블린에서 젤렌스키 대통령을 만날 예정이에요.",
+   "other": "영토, 안전 보장, 휴전 조건에서는 여전히 의견이 갈려요 (Euronews). 크렘린 대변인은 유럽의 지금 발언이 평화에 기여하려는 뜻을 보여 주지 않는다고 했고, 회담 전날 밤 두 나라는 대규모 드론 공격을 주고받았어요 (AP, ABC News).",
+   "korea": "러시아는 주요 원유·가스 수출국이라 협상 흐름은 국제 에너지 가격과 이어지고, 이는 에너지를 수입하는 우리 물가와 닿아 있어요.",
+   "src": ["AP", "Euronews", "ABC News"],
+   "links": ["https://www.nbcnews.com/world/middle-east/us-russia-ukraine-start-second-day-abu-dhabi-peace-talks-rcna608714", "https://www.euronews.com/2026/11/11/ukraine-russia-peace-talks-enter-second-day-with-territory-and-security-guarantees-in-focu", "https://abcnews.com/International/ukraine-russia-exchange-hundreds-drones-day-2-abu/story?id=138038984"]},
+  {"tag": "국제 경제", "title": "국제 유가 다시 올라…이란 \"미국과 협상 없다\" 부인",
+   "body": "11월 11일(현지) 오전 11시 18분(미국 동부) 브렌트유는 3% 가까이 오른 배럴당 93.90달러, WTI는 2% 가까이 오른 87.98달러에 거래됐어요 (OilPrice.com). 이란 최고 안보 당국자 레자이는 미국과의 협상설을 '순전한 거짓말'이라고 부인했어요. 11월 들어 이 시점 전까지 브렌트유는 약 21%, WTI는 약 17% 내린 상태였어요. AP도 이날 유가가 올랐다고 전했어요.",
+   "other": "사우디아라비아는 10월 원유 생산이 전쟁 전 수준에 가까워졌다고 밝혔고, 미국 휘발유 평균값은 하루 새 약 3.6센트 내린 갤런당 3.94달러로 18년 만에 가장 큰 하루 하락폭을 보였어요 (OilPrice.com, AAA 인용). 공급 쪽에서는 누그러지는 신호도 있어요.",
+   "korea": "원유를 거의 다 수입하는 우리나라는 유가가 오르내릴 때 수입 물가와 무역수지가 함께 영향을 받아요.",
+   "src": ["OilPrice.com", "AP"],
+   "links": ["https://oilprice.com/Latest-Energy-News/World-News/Brent-Jumps-3-to-94-as-Iran-Denies-Any-Talks-With-Washington.html", "https://krmg.com/2026/11/11/how-major-us-stock-indexes-fared-wednesday-11-11-2026/"]}
+ ],
+ "scan": [
+  {"sec": "국제 경제", "items": [
+   {"head": "사우디 10월 원유 생산", "points": ["전쟁 전 수준 가까이 회복"], "src": "OilPrice.com"},
+   {"head": "우크라이나 드론 공격으로 러시아 발트해 수출항 우스트루가에 화재", "points": ["10월 말 이후 러시아 정유 능력 약 30% 차질"], "src": "OilPrice.com"},
+   {"head": "미국 원유 재고 11월 6일까지 한 주에 900만 배럴 늘어", "points": ["미국석유협회 집계"], "src": "OilPrice.com"}
+  ]},
+  {"sec": "국제 금융", "items": [
+   {"head": "중국 인민은행 3분기 통화정책 보고서", "points": ["경기 대응 조정 강화·내수 확대 약속"], "src": "Reuters"},
+   {"head": "일본 정부 경제자문 민간위원들", "points": ["물가 2% 달성이 끝이 아니라 실질소득·생산성 높이는 성장이 목표"], "src": "Reuters"},
+   {"head": "비트코인 1% 넘게 올라", "points": ["7만4,500달러 근처"], "src": "Yahoo Finance"}
+  ]},
+  {"sec": "국제 정치", "items": [
+   {"head": "쿠슈너·위트코프 특사", "points": ["12일 모스크바서 푸틴, 이어 더블린서 젤렌스키 만나"], "src": "AP"},
+   {"head": "크렘린 \"유럽, 언젠가 협상 참여 가능\"", "points": ["지금은 평화 기여 의지 안 보인다고 밝혀"], "src": "AP"}
+  ]}
+ ]
+}</script>
+<script id="brief-archive" type="application/json">[{"date":"2026-11-12","label":"11/12 목","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-12/"},{"date":"2026-11-11","label":"11/11 수","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-11/"},{"date":"2026-11-10","label":"11/10 화","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-10/"},{"date":"2026-11-09","label":"11/9 월","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-09/"},{"date":"2026-11-08","label":"11/8 일","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-08/"},{"date":"2026-11-07","label":"11/7 토","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-07.html"},{"date":"2026-11-06","label":"11/6 금","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-06/"},{"date":"2026-11-05","label":"11/5 목","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-05.html"},{"date":"2026-11-04","label":"11/4 수","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-04.html"},{"date":"2026-11-03","label":"11/3 화","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-03.html"},{"date":"2026-11-02","label":"11/2 월","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-02.html"},{"date":"2026-11-01","label":"11/1 일","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-11-01.html"},{"date":"2026-10-31","label":"10/31 토","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-10-31.html"},{"date":"2026-10-30","label":"10/30 금","href":"https://mechanicjoke.github.io/ai-office-briefing/2026-10-30.html"}]</script>
+<script>
+/* 경제 한입 공유판·관리데스크 공통 틀 (scripts/share-template.html)
+   MODE: "reader" = 지인용 읽기 전용, "desk" = 대표님 관리 화면(복사 버튼)
+   내용은 reports/DATE/briefing-data.json 이 그대로 들어온다. 이 틀은 매일 고치지 않는다. */
+(function () {
+var MODE = "reader";
+var SITE = "https://mechanicjoke.github.io/ai-office-briefing/";
+var D = JSON.parse(document.getElementById("brief-data").textContent);
+var ARCH = JSON.parse(document.getElementById("brief-archive").textContent || "[]");
+var LINE = "━━━━━━━━━━━━";
+var NUM = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣"];
+var DESK = {"국제 정치":"pol","국제 금융":"fin","국제 경제":"eco"};
+var PAGE = SITE + D.date + "/";
+var core = D.core || [], scan = D.scan || [], mj = D.mj || null, alert = D.alert || null;
+var WEEKLY = D.type === "weekly";
+var news = D.news || [], big = D.big || [], rest = D.rest || [], sched = D.schedule || [], review = D.review || null;
+function dayHref(d) { for (var i = 0; i < ARCH.length; i++) { if (ARCH[i].date === d) return ARCH[i].href; } return ""; }
+
+/* ───── 복사용 원고: 화면 디자인과 따로 만든다 (문단마다 빈 줄 1개, 문장 중간 줄바꿈 없음, 이모지 유지) ───── */
+function srcText(s) { return (s || []).join(" · "); }
+function alertText() { return alert ? ["🚨 특보 | (" + alert.tag + ") " + alert.title, "→ " + alert.body, "📰 출처: " + srcText(alert.src)].join("\n\n") : ""; }
+function mjText() { return mj ? ["🤖 MJ 경제 수업 | " + mj.title].concat(mj.paras, ["오늘의 한 줄: " + mj.oneline, mj.end || "학습 종료."]).join("\n\n") : ""; }
+function coreText(c, i) {
+  var a = [NUM[i] + " (" + c.tag + ") " + c.title, "→ " + c.body];
+  if (c.other) a.push("⚖️ 다른 시각: " + c.other);
+  if (c.korea) a.push("🇰🇷 한국엔?(해석): " + c.korea);
+  a.push("📰 출처: " + srcText(c.src));
+  return a.join("\n\n");
+}
+function coreAll() { return "【오늘의 핵심 " + core.length + "】\n\n" + core.map(coreText).join("\n\n" + LINE + "\n\n"); }
+function scanLine(it) { return "☞ " + [it.head].concat(it.points || []).join("...") + " (" + it.src + ")"; }
+function scanAll() { return "【훑어보기】\n\n" + scan.map(function (s) { return "《" + s.sec + "》\n" + s.items.map(scanLine).join("\n\n"); }).join("\n\n"); }
+function top() { return "📮 경제 한입 | " + D.dateLabel; }
+function deskTop() { return "🌍 해외 특파원 데스크 | " + D.dateLabel; }
+function tail() { return "🔗 자세히 보기: " + PAGE; }
+function join(parts) { return parts.filter(Boolean).join("\n\n"); }
+var texts = {
+  link: function () { return top() + "\n" + PAGE; },
+  all: function () {
+    var p = [top()];
+    if (D.late) p.push("(" + D.late + ")");
+    if (alert) p.push(LINE, alertText());
+    if (mj) p.push(LINE, mjText());
+    if (core.length) p.push(LINE, "🌍 해외 특파원 데스크", coreAll());
+    if (scan.length) p.push(LINE, scanAll());
+    p.push(LINE, tail(), "※ 정리용 자료이며 투자 권유가 아닙니다.");
+    return join(p);
+  },
+  mj: function () { return join([mjText(), tail()]); },
+  core: function () { return join([deskTop(), coreAll(), tail()]); },
+  scan: function () { return join([deskTop(), scanAll(), tail()]); },
+  alert: function () { return join([top(), alertText(), tail()]); }
+};
+core.forEach(function (c, i) { texts["c" + i] = function () { return join([deskTop(), coreText(c, i), tail()]); }; });
+/* 위클리 복사용 원고 */
+function signTxt(c) { c = String(c); return c.charAt(0) === "+" ? "▲ " + c.slice(1) : c.charAt(0) === "-" ? "▼ " + c.slice(1) : c; }
+function wTop() { return "📮 위클리 경제 점검 | " + D.dateLabel + (D.weekLabel ? "\n(" + D.weekLabel + ")" : ""); }
+function newsText(n, i) { return [NUM[i] + " (" + n.tag + ") " + n.title + (n.when ? " · " + n.when : ""), "→ " + n.body, "📰 출처: " + srcText(n.src)].join("\n\n"); }
+function newsAll() { return "🌍 이번 주 " + news.length + "대 뉴스\n\n" + news.map(newsText).join("\n\n"); }
+function bigText(x) { return signTxt(x.change).charAt(0) === "▲" || signTxt(x.change).charAt(0) === "▼" ? signTxt(x.change).charAt(0) + " " + x.name + " " + x.value + " " + x.unit + " (" + x.prevDate + " " + x.prev + " → " + x.valueDate + ", " + x.change + ")\n" + x.mean : "• " + x.name + " " + x.value + " " + x.unit + " (" + x.prevDate + " → " + x.valueDate + ", " + x.change + ")\n" + x.mean; }
+function indAll() { return "📊 이번 주 크게 움직인 지표\n\n" + big.map(bigText).join("\n\n") + (rest.length ? "\n\n📋 나머지 지표\n" + rest.map(function (x) { return "· " + x.name + " " + x.value + " (" + x.change + ")"; }).join("\n") : ""); }
+function schedAll() { return "📅 다음 주와 그 뒤 일정\n" + sched.map(function (s) { return "· " + s.d + " " + s.what + (s.s ? " (" + s.s + ")" : ""); }).join("\n"); }
+function reviewAll() { if (!review) return ""; return join(["🤖 MJ 주간 복습 | 이번 주 배운 " + review.lessons.length + "가지", review.lessons.map(function (l) { return "· " + l.when + " " + l.title + " — " + l.oneline; }).join("\n"), (review.flow || []).join(" → ")].concat(review.paras, ["이번 주 한 줄: " + review.oneline, review.end || "학습 종료."])); }
+if (WEEKLY) {
+  texts.link = function () { return "📮 위클리 경제 점검 | " + D.dateLabel + "\n" + PAGE; };
+  texts.all = function () {
+    var p = [wTop()];
+    if (D.late) p.push("(" + D.late + ")");
+    if (alert) p.push(LINE, alertText());
+    if (news.length) p.push(LINE, newsAll());
+    if (big.length || rest.length) p.push(LINE, indAll());
+    if (sched.length) p.push(LINE, schedAll());
+    if (review) p.push(LINE, reviewAll());
+    p.push(LINE, tail(), "※ 정리용 자료이며 투자 권유가 아닙니다.");
+    return join(p);
+  };
+  texts.news = function () { return join([wTop(), newsAll(), tail()]); };
+  texts.ind = function () { return join([wTop(), indAll(), tail()]); };
+  texts.review = function () { return join([reviewAll(), tail()]); };
+  news.forEach(function (n, i) { texts["n" + i] = function () { return join([wTop(), newsText(n, i), tail()]); }; });
+}
+
+/* ───── 화면 ───── */
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (m) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]; }); }
+/* 숫자 강조: +는 빨강(상승), -는 파랑(하락), 큰 숫자는 굵게. 숫자 자체는 바꾸지 않는다 */
+function nums(s) {
+  return esc(s)
+    .replace(/([+＋]\d[\d,.]*%)/g, '<strong class="num up">$1</strong>')
+    .replace(/(^|[\s(（])(-\d[\d,.]*%)/g, '$1<strong class="num down">$2</strong>')
+    .replace(/(^|[^\w.,>+\-])(\d{1,3}(?:,\d{3})+(?:\.\d+)?)/g, '$1<strong class="num">$2</strong>');
+}
+function chip(tag) { return '<span class="chip ' + (DESK[tag] || "fin") + '">' + esc(tag) + '</span>'; }
+function copyBtn(key) { return MODE === "desk" ? '<button type="button" class="copy-sm" data-copy="' + key + '">이 글 복사</button>' : ""; }
+function srcChips(src, links) {
+  return '<div class="src">📰 ' + (src || []).map(function (s, i) {
+    var u = links && links[i];
+    return '<span>' + (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(s) + '</a>' : esc(s)) + '</span>';
+  }).join("") + '</div>';
+}
+function archiveNav() {
+  if (!ARCH.length) return "";
+  return '<nav class="archive" aria-label="지난 브리핑">' + ARCH.slice(0, 5).map(function (a) {
+    return '<a href="' + esc(a.href) + '"' + (a.date === D.date ? ' aria-current="page"' : "") + '>' + esc(a.label) + '</a>';
+  }).join("") + '<a href="' + SITE + 'archive.html">전체 목록</a></nav>';
+}
+function sec(title, inner) { return '<section style="display:grid;gap:12px"><h2 class="sec-h">' + title + '</h2>' + inner + '</section>'; }
+
+var h = '<header class="mast"><span class="kicker">' + (MODE === "desk" ? "DESK · 대표님 관리 화면" : (WEEKLY ? "WEEKLY REVIEW" : "MORNING BRIEF")) + '</span>' +
+  (WEEKLY ? '<h1>📮 위클리 경제 점검</h1><span class="date">' + esc(D.dateLabel) + (D.weekLabel ? ' · <span class="week">' + esc(D.weekLabel) + '</span>' : '') + '</span>'
+          : '<h1>📮 경제 한입</h1><span class="date">' + esc(D.dateLabel) + ' · 매일 아침 세계 경제를 쉽게</span>') + archiveNav() + '</header>';
+if (D.late) h += '<p class="late">' + esc(D.late) + '</p>';
+if (alert) h += '<section class="alert" aria-label="특보"><div class="card-head"><div class="meta"><span class="lbl">🚨 특보 · ' + esc(alert.tag) + '</span>' + copyBtn("alert") + '</div><h3>' + esc(alert.title) + '</h3></div><p>' + nums(alert.body) + '</p>' + srcChips(alert.src, alert.links) + '</section>';
+if (WEEKLY) {
+  var dirOf = function (c) { c = String(c); return c.charAt(0) === "+" ? "up" : (c.charAt(0) === "-" ? "down" : "flat"); };
+  var arrow = function (c) { var d = dirOf(c); return d === "up" ? "▲ " + esc(String(c).slice(1)) : d === "down" ? "▼ " + esc(String(c).slice(1)) : esc(c); };
+  var spark = function (v, d) {
+    if (!v || v.length < 2) return "";
+    var w = 132, hh = 52, p = 5, mn = Math.min.apply(0, v), mx = Math.max.apply(0, v), r = (mx - mn) || 1;
+    var pts = v.map(function (x, i) { return [p + i * (w - 2 * p) / (v.length - 1), hh - p - (x - mn) / r * (hh - 2 * p)]; });
+    var col = d === "up" ? "var(--up)" : d === "down" ? "var(--down)" : "var(--muted)";
+    var path = pts.map(function (q, i) { return (i ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1); }).join(" ");
+    var last = pts[pts.length - 1];
+    return '<svg viewBox="0 0 ' + w + ' ' + hh + '" aria-hidden="true"><path d="' + path + ' L' + last[0].toFixed(1) + ' ' + (hh - p) + ' L' + pts[0][0].toFixed(1) + ' ' + (hh - p) + ' Z" fill="' + col + '" opacity=".08"/><path d="' + path + '" fill="none" stroke="' + col + '" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="3.6" fill="' + col + '"/></svg>';
+  };
+  if (news.length) h += sec("🌍 이번 주 " + news.length + "대 뉴스", '<div class="news">' + news.map(function (n, i) {
+    var href = dayHref(n.date);
+    return '<article class="card"><div class="card-head"><div class="meta"><span>' + chip(n.tag) + ' <span class="when">' + esc(n.when) + '</span></span>' + (copyBtn("n" + i) || '<span class="n">' + NUM[i] + '</span>') + '</div><h3>' + esc(n.title) + '</h3></div><p>' + nums(n.body) + '</p>' + srcChips(n.src, n.links) + (href ? '<a class="more" href="' + esc(href) + '">그날 브리핑에서 자세히 →</a>' : '') + '</article>';
+  }).join("") + '</div>');
+  if (big.length) h += sec("📊 이번 주 크게 움직인 지표", '<div class="ind-big">' + big.map(function (x) {
+    var d = dirOf(x.change);
+    return '<article class="ind"><div class="nm"><span>' + esc(x.name) + '</span><span class="code">FRED ' + esc(x.code) + '</span></div><div class="val">' + esc(x.value) + '<small>' + esc(x.unit) + '</small></div>' + spark(x.series, d) + '<div class="line"><span class="chg ' + d + '">' + arrow(x.change) + '</span> <span class="from">(' + esc(x.prevDate) + ' ' + esc(x.prev) + ' → ' + esc(x.valueDate) + ')</span></div><p class="mean">' + esc(x.mean) + '</p></article>';
+  }).join("") + '</div>');
+  if (rest.length) h += sec("📋 나머지 지표", '<div style="overflow-x:auto"><table class="rest">' + rest.map(function (x) { var d = dirOf(x.change); return '<tr><td>' + esc(x.name) + '<span class="c">' + esc(x.code) + '</span></td><td>' + esc(x.value) + '</td><td class="' + d + '">' + arrow(x.change) + '</td></tr>'; }).join("") + '</table></div>');
+  if (sched.length) h += sec("📅 다음 주와 그 뒤 일정", '<ul class="sched">' + sched.map(function (s) { return '<li><span class="d">' + esc(s.d) + '</span><span>' + esc(s.what) + (s.s ? '<span class="s">' + esc(s.s) + '</span>' : '') + '</span></li>'; }).join("") + '</ul>');
+  if (review) h += sec("🤖 MJ 주간 복습", '<article class="mj"><div class="mj-top"><span class="id">MJ-01 · WEEKLY REVIEW</span>' + copyBtn("review") + '</div><div class="mj-body"><h3>이번 주 배운 ' + review.lessons.length + '가지</h3><ol class="lessons">' + review.lessons.map(function (l) { var href = dayHref(l.date); return '<li><span class="ld">' + esc(l.when) + '</span><span><b>' + (href ? '<a href="' + esc(href) + '" style="color:inherit">' + esc(l.title) + '</a>' : esc(l.title)) + '</b><span class="lo">' + esc(l.oneline) + '</span></span></li>'; }).join("") + '</ol>' +
+    ((review.flow || []).length ? '<div class="flow" aria-label="개념 연결">' + review.flow.map(function (f) { return '<span>' + esc(f) + '</span>'; }).join('<i>→</i>') + '</div>' : '') +
+    review.paras.map(function (p) { return '<p>' + nums(p) + '</p>'; }).join("") + '<p class="oneline"><b>이번 주 한 줄</b>' + esc(review.oneline) + '</p><p class="end">' + esc(review.end || "학습 종료.") + '</p></div></article>');
+} else {
+if (core.length) h += '<section class="toc" aria-label="오늘 요약"><h2>오늘 ' + core.length + '줄 요약</h2>' + core.map(function (c, i) {
+  return '<a href="#core-' + (i + 1) + '" data-jump="core-' + (i + 1) + '">' + chip(c.tag) + '<span class="t">' + esc(c.title) + '</span></a>';
+}).join("") + '</section>';
+if (mj) h += sec("🤖 MJ 경제 수업", '<article class="mj"><div class="mj-top"><span class="id">MJ-01 · ECONOMY CLASS' + (mj.no ? " · #" + esc(mj.no) : "") + '</span>' + copyBtn("mj") + '</div><div class="mj-body"><h3>' + esc(mj.title) + '</h3>' +
+  mj.paras.map(function (p) { return '<p>' + nums(p) + '</p>'; }).join("") +
+  '<p class="oneline"><b>오늘의 한 줄</b>' + esc(mj.oneline) + '</p><p class="end">' + esc(mj.end || "학습 종료.") + '</p></div></article>');
+if (core.length) h += sec("🌍 해외 특파원 데스크 · 핵심 " + core.length, '<div class="cards">' + core.map(function (c, i) {
+  return '<article class="card" id="core-' + (i + 1) + '"><div class="card-head"><div class="meta"><span>' + chip(c.tag) + ' <span class="n">' + NUM[i] + '</span></span>' + copyBtn("c" + i) + '</div><h3>' + esc(c.title) + '</h3></div>' +
+    '<p class="lead">' + nums(c.body) + '</p>' +
+    (c.other ? '<div class="box other"><span class="lbl">⚖️ 다른 시각</span><p>' + nums(c.other) + '</p></div>' : "") +
+    (c.korea ? '<div class="box kr"><span class="lbl">🇰🇷 한국엔? · 해석</span><p>' + nums(c.korea) + '</p></div>' : "") +
+    srcChips(c.src, c.links) + '</article>';
+}).join("") + '</div>');
+else h += sec("🌍 해외 특파원 데스크", '<p class="empty">오늘은 큰 해외 소식이 없어요.</p>');
+if (scan.length) h += sec("☞ 훑어보기", '<div class="scan">' + scan.map(function (s) {
+  return '<div class="scan-group"><div>' + chip(s.sec) + '</div><ul>' + s.items.map(function (it) {
+    return '<li><span class="hl">' + nums(it.head) + '</span>' + ((it.points || []).length ? '<span class="rest">' + it.points.map(nums).join(" · ") + '</span>' : "") + '<span class="s">' + esc(it.src) + '</span></li>';
+  }).join("") + '</ul></div>';
+}).join("") + '</div>');
+}
+if (MODE === "desk") h += '<section class="desk-note"><h2>📋 마지막으로 복사한 글 (카톡에 붙으면 이 모양)</h2><pre id="preview">아래 버튼을 누르면 복사된 글이 여기 그대로 보입니다.</pre></section>';
+h += '<footer>' + (WEEKLY ? '지표는 FRED(미국 세인트루이스 연은), 뉴스는 해외 매체 기사를 바탕으로 새로 요약했습니다. 미니 그래프는 최근 관측값 8개. ' : '해외 매체 기사를 바탕으로 새로 요약한 글입니다. ') + '숫자는 원문 그대로이며, 투자 권유가 아닙니다. 상승은 빨강, 하락은 파랑으로 표시합니다.' + (MODE === "desk" ? "" : ' · <a href="' + SITE + 'archive.html" style="color:inherit">지난 브리핑</a>') + '</footer>';
+document.getElementById("app").innerHTML = h;
+
+document.addEventListener("click", function (e) {
+  var j = e.target.closest && e.target.closest("[data-jump]");
+  if (j) { e.preventDefault(); var t = document.getElementById(j.getAttribute("data-jump")); if (t) t.scrollIntoView({behavior: window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); }
+});
+
+if (MODE !== "desk") return;
+var bar = document.createElement("div");
+bar.innerHTML = '<div class="deskbar"><div class="in">' +
+  '<button type="button" class="main" data-copy="link">🔗 공유 링크 복사</button>' +
+  '<button type="button" class="alt" data-copy="all">전체 글</button>' +
+  (WEEKLY ? '<button type="button" class="alt" data-copy="news">3대 뉴스</button>' + '<button type="button" class="alt" data-copy="review">MJ 복습</button>'
+          : '<button type="button" class="alt" data-copy="core">핵심 ' + core.length + '</button>' + '<button type="button" class="alt" data-copy="scan">훑어보기</button>') + '</div></div><div class="toast" id="toast" hidden></div>';
+document.body.appendChild(bar);
+var toast = document.getElementById("toast");
+function show(m) { toast.textContent = m; toast.hidden = false; clearTimeout(show.t); show.t = setTimeout(function () { toast.hidden = true; }, 1800); }
+function fallback(t) { var a = document.createElement("textarea"); a.value = t; a.setAttribute("readonly", ""); a.style.position = "fixed"; a.style.opacity = "0"; document.body.appendChild(a); a.select(); a.setSelectionRange(0, t.length); var ok = false; try { ok = document.execCommand("copy"); } catch (_) {} document.body.removeChild(a); return ok; }
+document.addEventListener("click", function (e) {
+  var b = e.target.closest && e.target.closest("[data-copy]"); if (!b) return;
+  var t = texts[b.getAttribute("data-copy")]();
+  document.getElementById("preview").textContent = t;
+  function ok() { show("복사됐어요. 카톡에 붙여넣으세요"); }
+  function no() { if (fallback(t)) ok(); else show("자동 복사가 막혔어요. 미리보기 글을 길게 눌러 복사하세요"); }
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, no); else no();
+});
+})();
+</script>
+</body>
+</html>
